@@ -250,6 +250,8 @@ def main(cfg: DictConfig) -> None:  # noqa: D401
     if not run_cfg_path.exists():
         raise FileNotFoundError(f"Run-config not found: {run_cfg_path}")
     run_cfg = OmegaConf.load(run_cfg_path)
+    # Disable struct mode to allow new keys from run-specific config
+    OmegaConf.set_struct(cfg, False)
     cfg = OmegaConf.merge(cfg, run_cfg)
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~ mode-specific knobs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
