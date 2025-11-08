@@ -1,0 +1,226 @@
+Using CPython 3.11.14
+Creating virtual environment at: .venv
+Resolved 130 packages in 1.04s
+Installed 100 packages in 7.25s
+ + accelerate==1.11.0
+ + aiohappyeyeballs==2.6.1
+ + aiohttp==3.13.2
+ + aiosignal==1.4.0
+ + alembic==1.17.1
+ + annotated-types==0.7.0
+ + antlr4-python3-runtime==4.9.3
+ + anyio==4.11.0
+ + attrs==25.4.0
+ + certifi==2025.10.5
+ + charset-normalizer==3.4.4
+ + click==8.3.0
+ + colorlog==6.10.1
+ + contourpy==1.3.3
+ + cycler==0.12.1
+ + datasets==4.4.1
+ + dill==0.4.0
+ + filelock==3.20.0
+ + fonttools==4.60.1
+ + frozenlist==1.8.0
+ + fsspec==2025.10.0
+ + gitdb==4.0.12
+ + gitpython==3.1.45
+ + graff-experiments==0.1.0 (from file:///mnt/home/toma/KRK-039/_work/airas-20251108-172559-matsuzawa/airas-20251108-172559-matsuzawa)
+ + greenlet==3.2.4
+ + h11==0.16.0
+ + hf-xet==1.2.0
+ + httpcore==1.0.9
+ + httpx==0.28.1
+ + huggingface-hub==0.36.0
+ + hydra-core==1.3.2
+ + idna==3.11
+ + jinja2==3.1.6
+ + joblib==1.5.2
+ + kiwisolver==1.4.9
+ + mako==1.3.10
+ + markupsafe==3.0.3
+ + matplotlib==3.10.7
+ + mpmath==1.3.0
+ + multidict==6.7.0
+ + multiprocess==0.70.18
+ + networkx==3.5
+ + numpy==2.3.4
+ + nvidia-cublas-cu12==12.8.4.1
+ + nvidia-cuda-cupti-cu12==12.8.90
+ + nvidia-cuda-nvrtc-cu12==12.8.93
+ + nvidia-cuda-runtime-cu12==12.8.90
+ + nvidia-cudnn-cu12==9.10.2.21
+ + nvidia-cufft-cu12==11.3.3.83
+ + nvidia-cufile-cu12==1.13.1.3
+ + nvidia-curand-cu12==10.3.9.90
+ + nvidia-cusolver-cu12==11.7.3.90
+ + nvidia-cusparse-cu12==12.5.8.93
+ + nvidia-cusparselt-cu12==0.7.1
+ + nvidia-nccl-cu12==2.27.5
+ + nvidia-nvjitlink-cu12==12.8.93
+ + nvidia-nvshmem-cu12==3.3.20
+ + nvidia-nvtx-cu12==12.8.90
+ + omegaconf==2.3.0
+ + optuna==4.5.0
+ + packaging==25.0
+ + pandas==2.3.3
+ + peft==0.17.1
+ + pillow==12.0.0
+ + platformdirs==4.5.0
+ + propcache==0.4.1
+ + protobuf==6.33.0
+ + psutil==7.1.3
+ + pyarrow==22.0.0
+ + pydantic==2.12.4
+ + pydantic-core==2.41.5
+ + pyparsing==3.2.5
+ + python-dateutil==2.9.0.post0
+ + pytz==2025.2
+ + pyyaml==6.0.3
+ + regex==2025.11.3
+ + requests==2.32.5
+ + safetensors==0.6.2
+ + scikit-learn==1.7.2
+ + scipy==1.16.3
+ + seaborn==0.13.2
+ + sentry-sdk==2.43.0
+ + six==1.17.0
+ + smmap==5.0.2
+ + sniffio==1.3.1
+ + sqlalchemy==2.0.44
+ + sympy==1.14.0
+ + threadpoolctl==3.6.0
+ + tokenizers==0.22.1
+ + torch==2.9.0
+ + tqdm==4.67.1
+ + transformers==4.57.1
+ + triton==3.5.0
+ + typing-extensions==4.15.0
+ + typing-inspection==0.4.2
+ + tzdata==2025.2
+ + urllib3==2.5.0
+ + wandb==0.22.3
+ + xxhash==3.6.0
+ + yarl==1.22.0
+/mnt/home/toma/KRK-039/_work/airas-20251108-172559-matsuzawa/airas-20251108-172559-matsuzawa/src/main.py:17: UserWarning: 
+The version_base parameter is not specified.
+Please specify a compatability version level, or None.
+Will assume defaults for version 1.1
+  @hydra.main(config_path="../config", config_name="config")
+/mnt/home/toma/KRK-039/_work/airas-20251108-172559-matsuzawa/airas-20251108-172559-matsuzawa/.venv/lib/python3.11/site-packages/hydra/_internal/hydra.py:119: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+/mnt/home/toma/KRK-039/_work/airas-20251108-172559-matsuzawa/airas-20251108-172559-matsuzawa/src/train.py:245: UserWarning: 
+The version_base parameter is not specified.
+Please specify a compatability version level, or None.
+Will assume defaults for version 1.1
+  @hydra.main(config_path="../config", config_name="config")
+/mnt/home/toma/KRK-039/_work/airas-20251108-172559-matsuzawa/airas-20251108-172559-matsuzawa/.venv/lib/python3.11/site-packages/hydra/_internal/hydra.py:119: UserWarning: Future Hydra versions will no longer change working directory at job runtime by default.
+See https://hydra.cc/docs/1.2/upgrades/1.1_to_1.2/changes_to_job_working_dir/ for more information.
+  ret = run_job(
+[I 2025-11-09 05:00:03,658] A new study created in memory with name: no-name-807336f5-cecf-45f3-8179-dc63d64d5f68
+Generating train split:   0%|          | 0/7473 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 7473/7473 [00:00<00:00, 113244.89 examples/s]
+Generating test split:   0%|          | 0/1319 [00:00<?, ? examples/s]Generating test split: 100%|██████████| 1319/1319 [00:00<00:00, 99916.69 examples/s]
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  12%|█▏        | 160/1319 [00:00<00:00, 1578.81 examples/s]Map:  26%|██▋       | 349/1319 [00:00<00:00, 1753.43 examples/s]Map:  41%|████▏     | 547/1319 [00:00<00:00, 1847.82 examples/s]Map:  56%|█████▌    | 741/1319 [00:00<00:00, 1883.14 examples/s]Map:  76%|███████▌  | 1000/1319 [00:00<00:00, 1578.13 examples/s]Map:  90%|████████▉ | 1185/1319 [00:00<00:00, 1649.52 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1635.66 examples/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+/mnt/home/toma/KRK-039/_work/airas-20251108-172559-matsuzawa/airas-20251108-172559-matsuzawa/src/train.py:167: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  scaler = torch.cuda.amp.GradScaler(enabled=cfg.training.mixed_precision in ("fp16", "bf16"))
+[I 2025-11-09 05:04:00,923] Trial 0 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0003468624138587739, 'controller_lr': 0.0001537085391873368, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 178/1319 [00:00<00:00, 1757.14 examples/s]Map:  27%|██▋       | 362/1319 [00:00<00:00, 1794.40 examples/s]Map:  41%|████▏     | 547/1319 [00:00<00:00, 1814.18 examples/s]Map:  55%|█████▌    | 730/1319 [00:00<00:00, 1818.21 examples/s]Map:  70%|██████▉   | 920/1319 [00:00<00:00, 1846.08 examples/s]Map:  89%|████████▉ | 1180/1319 [00:00<00:00, 1567.33 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1629.55 examples/s]
+[I 2025-11-09 05:07:21,968] Trial 1 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00010523474967154542, 'controller_lr': 0.00030071877165611103, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1752.48 examples/s]Map:  27%|██▋       | 362/1319 [00:00<00:00, 1804.13 examples/s]Map:  41%|████      | 543/1319 [00:00<00:00, 1800.39 examples/s]Map:  55%|█████▌    | 729/1319 [00:00<00:00, 1818.89 examples/s]Map:  69%|██████▉   | 916/1319 [00:00<00:00, 1834.66 examples/s]Map:  90%|████████▉ | 1184/1319 [00:00<00:00, 1577.17 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1634.41 examples/s]
+[I 2025-11-09 05:10:41,622] Trial 2 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00040947103631151614, 'controller_lr': 8.292489036903088e-05, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1755.28 examples/s]Map:  33%|███▎      | 441/1319 [00:00<00:00, 1752.16 examples/s]Map:  47%|████▋     | 624/1319 [00:00<00:00, 1781.22 examples/s]Map:  68%|██████▊   | 892/1319 [00:00<00:00, 1777.97 examples/s]Map:  82%|████████▏ | 1087/1319 [00:00<00:00, 1526.19 examples/s]Map:  96%|█████████▌| 1268/1319 [00:00<00:00, 1598.66 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1596.31 examples/s]
+[I 2025-11-09 05:14:01,784] Trial 3 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00024114815666755095, 'controller_lr': 0.00012523571196520832, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 176/1319 [00:00<00:00, 1741.01 examples/s]Map:  27%|██▋       | 360/1319 [00:00<00:00, 1788.86 examples/s]Map:  41%|████      | 542/1319 [00:00<00:00, 1799.37 examples/s]Map:  55%|█████▌    | 727/1319 [00:00<00:00, 1812.85 examples/s]Map:  69%|██████▉   | 911/1319 [00:00<00:00, 1817.18 examples/s]Map:  89%|████████▉ | 1180/1319 [00:00<00:00, 1556.40 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1617.49 examples/s]
+[I 2025-11-09 05:17:21,328] Trial 4 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00016150397216668013, 'controller_lr': 5.432671824043147e-05, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1752.44 examples/s]Map:  27%|██▋       | 362/1319 [00:00<00:00, 1801.11 examples/s]Map:  41%|████▏     | 545/1319 [00:00<00:00, 1808.91 examples/s]Map:  55%|█████▌    | 728/1319 [00:00<00:00, 1813.48 examples/s]Map:  69%|██████▉   | 912/1319 [00:00<00:00, 1819.53 examples/s]Map:  89%|████████▉ | 1174/1319 [00:00<00:00, 1535.54 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1603.90 examples/s]
+[I 2025-11-09 05:20:41,497] Trial 5 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0003892544044973968, 'controller_lr': 0.00040315823914597443, 'lora_r': 64}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 172/1319 [00:00<00:00, 1705.03 examples/s]Map:  27%|██▋       | 355/1319 [00:00<00:00, 1774.63 examples/s]Map:  47%|████▋     | 624/1319 [00:00<00:00, 1779.97 examples/s]Map:  61%|██████▏   | 808/1319 [00:00<00:00, 1796.00 examples/s]Map:  75%|███████▌  | 993/1319 [00:00<00:00, 1810.52 examples/s]Map:  89%|████████▉ | 1178/1319 [00:00<00:00, 1532.94 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1610.01 examples/s]
+[I 2025-11-09 05:24:01,719] Trial 6 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0004320675515861298, 'controller_lr': 0.00019468340477863243, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 174/1319 [00:00<00:00, 1722.10 examples/s]Map:  27%|██▋       | 358/1319 [00:00<00:00, 1747.50 examples/s]Map:  41%|████      | 543/1319 [00:00<00:00, 1787.87 examples/s]Map:  55%|█████▌    | 727/1319 [00:00<00:00, 1803.54 examples/s]Map:  69%|██████▉   | 910/1319 [00:00<00:00, 1810.61 examples/s]Map:  89%|████████▉ | 1180/1319 [00:00<00:00, 1542.24 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1601.59 examples/s]
+[I 2025-11-09 05:27:21,739] Trial 7 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00010987859435505945, 'controller_lr': 0.0001557046894228884, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 175/1319 [00:00<00:00, 1722.92 examples/s]Map:  27%|██▋       | 356/1319 [00:00<00:00, 1766.58 examples/s]Map:  41%|████      | 536/1319 [00:00<00:00, 1778.95 examples/s]Map:  61%|██████    | 798/1319 [00:00<00:00, 1758.73 examples/s]Map:  74%|███████▍  | 976/1319 [00:00<00:00, 1762.95 examples/s]Map:  89%|████████▉ | 1180/1319 [00:00<00:00, 1514.73 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1602.26 examples/s]
+[I 2025-11-09 05:30:43,320] Trial 8 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0001202906022610195, 'controller_lr': 0.00038027374430056127, 'lora_r': 64}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 176/1319 [00:00<00:00, 1744.15 examples/s]Map:  27%|██▋       | 359/1319 [00:00<00:00, 1790.59 examples/s]Map:  48%|████▊     | 628/1319 [00:00<00:00, 1790.82 examples/s]Map:  61%|██████▏   | 811/1319 [00:00<00:00, 1799.30 examples/s]Map:  75%|███████▌  | 994/1319 [00:00<00:00, 1805.94 examples/s]Map:  89%|████████▉ | 1180/1319 [00:00<00:00, 1539.40 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1612.67 examples/s]
+[I 2025-11-09 05:34:03,351] Trial 9 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0002818419368138089, 'controller_lr': 0.0001001166163784768, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 178/1319 [00:00<00:00, 1759.35 examples/s]Map:  28%|██▊       | 363/1319 [00:00<00:00, 1806.45 examples/s]Map:  41%|████      | 544/1319 [00:00<00:00, 1805.41 examples/s]Map:  55%|█████▌    | 729/1319 [00:00<00:00, 1816.78 examples/s]Map:  69%|██████▉   | 914/1319 [00:00<00:00, 1824.41 examples/s]Map:  89%|████████▉ | 1180/1319 [00:00<00:00, 1563.04 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1622.81 examples/s]
+[I 2025-11-09 05:37:23,433] Trial 10 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00029757212096719754, 'controller_lr': 0.00022855090797669014, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1757.75 examples/s]Map:  27%|██▋       | 361/1319 [00:00<00:00, 1800.68 examples/s]Map:  41%|████▏     | 547/1319 [00:00<00:00, 1821.95 examples/s]Map:  62%|██████▏   | 819/1319 [00:00<00:00, 1811.88 examples/s]Map:  82%|████████▏ | 1087/1319 [00:00<00:00, 1576.40 examples/s]Map:  96%|█████████▌| 1269/1319 [00:00<00:00, 1637.30 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1624.39 examples/s]
+[I 2025-11-09 05:40:43,501] Trial 11 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00016840306154939215, 'controller_lr': 0.00027139520675486894, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1754.33 examples/s]Map:  27%|██▋       | 357/1319 [00:00<00:00, 1774.94 examples/s]Map:  41%|████      | 542/1319 [00:00<00:00, 1801.79 examples/s]Map:  55%|█████▍    | 725/1319 [00:00<00:00, 1808.57 examples/s]Map:  69%|██████▉   | 907/1319 [00:00<00:00, 1805.05 examples/s]Map:  89%|████████▉ | 1178/1319 [00:00<00:00, 1546.40 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1608.59 examples/s]
+[I 2025-11-09 05:44:04,763] Trial 12 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0001761858462838606, 'controller_lr': 0.00029555438711581505, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 166/1319 [00:00<00:00, 1639.77 examples/s]Map:  26%|██▌       | 344/1319 [00:00<00:00, 1717.80 examples/s]Map:  40%|███▉      | 524/1319 [00:00<00:00, 1753.30 examples/s]Map:  54%|█████▎    | 706/1319 [00:00<00:00, 1773.63 examples/s]Map:  73%|███████▎  | 969/1319 [00:00<00:00, 1760.02 examples/s]Map:  89%|████████▉ | 1176/1319 [00:00<00:00, 1523.44 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1579.56 examples/s]
+[I 2025-11-09 05:47:24,885] Trial 13 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00031387075423705964, 'controller_lr': 0.0001649735701911032, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 176/1319 [00:00<00:00, 1743.49 examples/s]Map:  27%|██▋       | 362/1319 [00:00<00:00, 1799.80 examples/s]Map:  48%|████▊     | 631/1319 [00:00<00:00, 1786.03 examples/s]Map:  61%|██████▏   | 811/1319 [00:00<00:00, 1785.17 examples/s]Map:  76%|███████▌  | 1000/1319 [00:00<00:00, 1510.87 examples/s]Map:  89%|████████▉ | 1176/1319 [00:00<00:00, 1579.08 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1593.34 examples/s]
+[I 2025-11-09 05:50:45,672] Trial 14 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00021175479439259303, 'controller_lr': 0.00045908598960063947, 'lora_r': 64}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 173/1319 [00:00<00:00, 1716.66 examples/s]Map:  27%|██▋       | 352/1319 [00:00<00:00, 1756.51 examples/s]Map:  40%|████      | 534/1319 [00:00<00:00, 1784.09 examples/s]Map:  54%|█████▍    | 713/1319 [00:00<00:00, 1782.80 examples/s]Map:  68%|██████▊   | 896/1319 [00:00<00:00, 1795.01 examples/s]Map:  82%|████████▏ | 1087/1319 [00:00<00:00, 1501.80 examples/s]Map:  96%|█████████▌| 1268/1319 [00:00<00:00, 1588.34 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1598.33 examples/s]
+[I 2025-11-09 05:54:06,130] Trial 15 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0004927243394619597, 'controller_lr': 0.00030435072382304664, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 173/1319 [00:00<00:00, 1707.75 examples/s]Map:  27%|██▋       | 353/1319 [00:00<00:00, 1759.75 examples/s]Map:  40%|████      | 534/1319 [00:00<00:00, 1778.82 examples/s]Map:  54%|█████▍    | 715/1319 [00:00<00:00, 1788.02 examples/s]Map:  68%|██████▊   | 894/1319 [00:00<00:00, 1783.83 examples/s]Map:  82%|████████▏ | 1087/1319 [00:00<00:00, 1504.95 examples/s]Map:  96%|█████████▌| 1268/1319 [00:00<00:00, 1588.41 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1600.52 examples/s]
+[I 2025-11-09 05:57:26,047] Trial 16 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00013414336904203847, 'controller_lr': 0.00011959030749321962, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1757.25 examples/s]Map:  27%|██▋       | 361/1319 [00:00<00:00, 1800.76 examples/s]Map:  41%|████▏     | 546/1319 [00:00<00:00, 1818.99 examples/s]Map:  55%|█████▌    | 730/1319 [00:00<00:00, 1825.18 examples/s]Map:  69%|██████▉   | 916/1319 [00:00<00:00, 1834.60 examples/s]Map:  90%|████████▉ | 1181/1319 [00:00<00:00, 1566.76 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1629.88 examples/s]
+[I 2025-11-09 06:00:46,367] Trial 17 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00023038129012732076, 'controller_lr': 7.251831801156211e-05, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1753.45 examples/s]Map:  27%|██▋       | 358/1319 [00:00<00:00, 1781.99 examples/s]Map:  41%|████      | 540/1319 [00:00<00:00, 1794.94 examples/s]Map:  55%|█████▍    | 725/1319 [00:00<00:00, 1809.94 examples/s]Map:  69%|██████▉   | 909/1319 [00:00<00:00, 1818.27 examples/s]Map:  89%|████████▉ | 1180/1319 [00:00<00:00, 1561.44 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1618.35 examples/s]
+[I 2025-11-09 06:04:07,328] Trial 18 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00010183407081252673, 'controller_lr': 0.00021173813411149895, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  14%|█▎        | 179/1319 [00:00<00:00, 1771.03 examples/s]Map:  28%|██▊       | 368/1319 [00:00<00:00, 1831.94 examples/s]Map:  42%|████▏     | 557/1319 [00:00<00:00, 1856.26 examples/s]Map:  56%|█████▋    | 745/1319 [00:00<00:00, 1858.74 examples/s]Map:  71%|███████   | 934/1319 [00:00<00:00, 1863.40 examples/s]Map:  90%|████████▉ | 1184/1319 [00:00<00:00, 1583.50 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1654.31 examples/s]
+[I 2025-11-09 06:07:27,622] Trial 19 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0003279952156593455, 'controller_lr': 0.0001556029847837466, 'lora_r': 64}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  14%|█▎        | 179/1319 [00:00<00:00, 1777.24 examples/s]Map:  28%|██▊       | 365/1319 [00:00<00:00, 1819.02 examples/s]Map:  42%|████▏     | 548/1319 [00:00<00:00, 1818.01 examples/s]Map:  55%|█████▌    | 732/1319 [00:00<00:00, 1824.72 examples/s]Map:  75%|███████▌  | 995/1319 [00:00<00:00, 1788.83 examples/s]Map:  89%|████████▉ | 1177/1319 [00:00<00:00, 1521.33 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1605.92 examples/s]
+[I 2025-11-09 06:10:47,964] Trial 20 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00013325821561223936, 'controller_lr': 0.0004940470576069819, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  14%|█▎        | 181/1319 [00:00<00:00, 1793.73 examples/s]Map:  28%|██▊       | 369/1319 [00:00<00:00, 1834.65 examples/s]Map:  42%|████▏     | 555/1319 [00:00<00:00, 1839.90 examples/s]Map:  56%|█████▋    | 743/1319 [00:00<00:00, 1848.85 examples/s]Map:  70%|███████   | 929/1319 [00:00<00:00, 1849.44 examples/s]Map:  90%|████████▉ | 1184/1319 [00:00<00:00, 1582.14 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1646.56 examples/s]
+[I 2025-11-09 06:14:07,184] Trial 21 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00036405500905820667, 'controller_lr': 8.21898727631734e-05, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 176/1319 [00:00<00:00, 1740.46 examples/s]Map:  27%|██▋       | 359/1319 [00:00<00:00, 1790.64 examples/s]Map:  41%|████      | 544/1319 [00:00<00:00, 1813.65 examples/s]Map:  55%|█████▌    | 727/1319 [00:00<00:00, 1818.76 examples/s]Map:  69%|██████▉   | 911/1319 [00:00<00:00, 1823.05 examples/s]Map:  89%|████████▊ | 1169/1319 [00:00<00:00, 1533.65 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1603.51 examples/s]
+[I 2025-11-09 06:17:26,831] Trial 22 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00046449054321075136, 'controller_lr': 5.197437872443633e-05, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 176/1319 [00:00<00:00, 1739.88 examples/s]Map:  27%|██▋       | 361/1319 [00:00<00:00, 1800.16 examples/s]Map:  47%|████▋     | 626/1319 [00:00<00:00, 1777.83 examples/s]Map:  61%|██████    | 806/1319 [00:00<00:00, 1782.11 examples/s]Map:  75%|███████▍  | 988/1319 [00:00<00:00, 1792.06 examples/s]Map:  90%|████████▉ | 1183/1319 [00:00<00:00, 1538.10 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1606.85 examples/s]
+[I 2025-11-09 06:20:47,154] Trial 23 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0003889725608270881, 'controller_lr': 6.98155249954471e-05, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 178/1319 [00:00<00:00, 1763.16 examples/s]Map:  33%|███▎      | 440/1319 [00:00<00:00, 1741.46 examples/s]Map:  48%|████▊     | 627/1319 [00:00<00:00, 1788.28 examples/s]Map:  61%|██████▏   | 808/1319 [00:00<00:00, 1793.73 examples/s]Map:  75%|███████▌  | 992/1319 [00:00<00:00, 1804.12 examples/s]Map:  96%|█████████▌| 1260/1319 [00:00<00:00, 1537.89 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1606.66 examples/s]
+[I 2025-11-09 06:24:07,124] Trial 24 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00026447340016740565, 'controller_lr': 9.89638358195913e-05, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 178/1319 [00:00<00:00, 1762.13 examples/s]Map:  28%|██▊       | 365/1319 [00:00<00:00, 1821.87 examples/s]Map:  42%|████▏     | 548/1319 [00:00<00:00, 1820.11 examples/s]Map:  56%|█████▌    | 734/1319 [00:00<00:00, 1830.40 examples/s]Map:  70%|██████▉   | 920/1319 [00:00<00:00, 1838.93 examples/s]Map:  89%|████████▉ | 1180/1319 [00:00<00:00, 1564.96 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1629.54 examples/s]
+[I 2025-11-09 06:27:28,013] Trial 25 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00020150835834761206, 'controller_lr': 0.00013189922905080108, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 176/1319 [00:00<00:00, 1740.10 examples/s]Map:  27%|██▋       | 360/1319 [00:00<00:00, 1787.22 examples/s]Map:  41%|████      | 543/1319 [00:00<00:00, 1803.72 examples/s]Map:  55%|█████▌    | 727/1319 [00:00<00:00, 1806.01 examples/s]Map:  75%|███████▍  | 988/1319 [00:00<00:00, 1771.51 examples/s]Map:  89%|████████▉ | 1176/1319 [00:00<00:00, 1515.91 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1589.71 examples/s]
+[I 2025-11-09 06:30:48,627] Trial 26 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00035459584961326253, 'controller_lr': 9.161370841413733e-05, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1752.68 examples/s]Map:  27%|██▋       | 361/1319 [00:00<00:00, 1799.13 examples/s]Map:  41%|████▏     | 546/1319 [00:00<00:00, 1817.08 examples/s]Map:  55%|█████▌    | 729/1319 [00:00<00:00, 1815.74 examples/s]Map:  69%|██████▉   | 913/1319 [00:00<00:00, 1821.73 examples/s]Map:  89%|████████▉ | 1179/1319 [00:00<00:00, 1557.07 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1621.18 examples/s]
+[I 2025-11-09 06:34:08,977] Trial 27 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.000428703017901979, 'controller_lr': 0.0002610782597725475, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 175/1319 [00:00<00:00, 1733.05 examples/s]Map:  27%|██▋       | 356/1319 [00:00<00:00, 1773.42 examples/s]Map:  47%|████▋     | 623/1319 [00:00<00:00, 1773.43 examples/s]Map:  67%|██████▋   | 884/1319 [00:00<00:00, 1751.32 examples/s]Map:  82%|████████▏ | 1083/1319 [00:00<00:00, 1505.73 examples/s]Map:  96%|█████████▌| 1265/1319 [00:00<00:00, 1582.51 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1580.49 examples/s]
+[I 2025-11-09 06:37:28,829] Trial 28 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00025924874894294505, 'controller_lr': 0.00018264441876586742, 'lora_r': 64}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 175/1319 [00:00<00:00, 1737.61 examples/s]Map:  27%|██▋       | 359/1319 [00:00<00:00, 1790.13 examples/s]Map:  41%|████      | 544/1319 [00:00<00:00, 1813.96 examples/s]Map:  55%|█████▌    | 727/1319 [00:00<00:00, 1819.36 examples/s]Map:  69%|██████▉   | 909/1319 [00:00<00:00, 1815.41 examples/s]Map:  89%|████████▉ | 1178/1319 [00:00<00:00, 1550.13 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1613.93 examples/s]
+[I 2025-11-09 06:40:49,565] Trial 29 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00019630607682041688, 'controller_lr': 0.00013064016866623217, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 173/1319 [00:00<00:00, 1710.62 examples/s]Map:  27%|██▋       | 356/1319 [00:00<00:00, 1775.20 examples/s]Map:  41%|████      | 541/1319 [00:00<00:00, 1803.17 examples/s]Map:  55%|█████▍    | 725/1319 [00:00<00:00, 1814.80 examples/s]Map:  69%|██████▉   | 908/1319 [00:00<00:00, 1816.85 examples/s]Map:  89%|████████▉ | 1178/1319 [00:00<00:00, 1552.50 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1613.34 examples/s]
+[I 2025-11-09 06:44:09,803] Trial 30 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0002449623582813475, 'controller_lr': 6.453083182267112e-05, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 174/1319 [00:00<00:00, 1725.33 examples/s]Map:  27%|██▋       | 359/1319 [00:00<00:00, 1789.59 examples/s]Map:  47%|████▋     | 624/1319 [00:00<00:00, 1774.76 examples/s]Map:  61%|██████    | 806/1319 [00:00<00:00, 1787.78 examples/s]Map:  75%|███████▍  | 987/1319 [00:00<00:00, 1790.64 examples/s]Map:  89%|████████▉ | 1178/1319 [00:00<00:00, 1521.31 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1600.27 examples/s]
+[I 2025-11-09 06:47:31,140] Trial 31 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00015514888202924955, 'controller_lr': 0.00011495436739720805, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 175/1319 [00:00<00:00, 1738.86 examples/s]Map:  27%|██▋       | 359/1319 [00:00<00:00, 1790.07 examples/s]Map:  41%|████      | 543/1319 [00:00<00:00, 1807.67 examples/s]Map:  55%|█████▌    | 726/1319 [00:00<00:00, 1811.92 examples/s]Map:  69%|██████▉   | 908/1319 [00:00<00:00, 1811.64 examples/s]Map:  90%|████████▉ | 1181/1319 [00:00<00:00, 1557.14 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1615.17 examples/s]
+[I 2025-11-09 06:50:50,799] Trial 32 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0003518412150242158, 'controller_lr': 0.0001394469533612831, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 175/1319 [00:00<00:00, 1736.43 examples/s]Map:  27%|██▋       | 358/1319 [00:00<00:00, 1786.44 examples/s]Map:  41%|████      | 539/1319 [00:00<00:00, 1796.01 examples/s]Map:  55%|█████▍    | 723/1319 [00:00<00:00, 1807.63 examples/s]Map:  75%|███████▌  | 991/1319 [00:00<00:00, 1793.28 examples/s]Map:  89%|████████▉ | 1178/1319 [00:00<00:00, 1535.79 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1605.32 examples/s]
+[I 2025-11-09 06:54:11,527] Trial 33 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0004147625478230633, 'controller_lr': 6.11294515383791e-05, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 178/1319 [00:00<00:00, 1750.64 examples/s]Map:  28%|██▊       | 364/1319 [00:00<00:00, 1812.54 examples/s]Map:  48%|████▊     | 636/1319 [00:00<00:00, 1806.55 examples/s]Map:  69%|██████▉   | 909/1319 [00:00<00:00, 1811.05 examples/s]Map:  90%|████████▉ | 1181/1319 [00:00<00:00, 1579.57 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1614.85 examples/s]
+[I 2025-11-09 06:57:33,492] Trial 34 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00015144358950899982, 'controller_lr': 0.00011290750795851376, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  14%|█▎        | 179/1319 [00:00<00:00, 1774.42 examples/s]Map:  28%|██▊       | 366/1319 [00:00<00:00, 1827.22 examples/s]Map:  42%|████▏     | 552/1319 [00:00<00:00, 1834.02 examples/s]Map:  56%|█████▌    | 740/1319 [00:00<00:00, 1848.86 examples/s]Map:  76%|███████▌  | 1000/1319 [00:00<00:00, 1564.28 examples/s]Map:  89%|████████▉ | 1180/1319 [00:00<00:00, 1624.28 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1629.93 examples/s]
+[I 2025-11-09 07:00:54,362] Trial 35 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0003254509522876942, 'controller_lr': 0.000364586840303778, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 178/1319 [00:00<00:00, 1754.72 examples/s]Map:  28%|██▊       | 366/1319 [00:00<00:00, 1823.84 examples/s]Map:  42%|████▏     | 551/1319 [00:00<00:00, 1831.69 examples/s]Map:  56%|█████▌    | 735/1319 [00:00<00:00, 1831.09 examples/s]Map:  70%|██████▉   | 922/1319 [00:00<00:00, 1841.93 examples/s]Map:  89%|████████▉ | 1179/1319 [00:00<00:00, 1558.17 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1626.41 examples/s]
+[I 2025-11-09 07:04:15,047] Trial 36 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0002931867206553273, 'controller_lr': 8.507662338998392e-05, 'lora_r': 64}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1753.73 examples/s]Map:  27%|██▋       | 362/1319 [00:00<00:00, 1803.09 examples/s]Map:  42%|████▏     | 549/1319 [00:00<00:00, 1829.19 examples/s]Map:  62%|██████▏   | 819/1319 [00:00<00:00, 1808.72 examples/s]Map:  82%|████████▏ | 1087/1319 [00:00<00:00, 1569.64 examples/s]Map:  96%|█████████▋| 1271/1319 [00:00<00:00, 1635.77 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1624.74 examples/s]
+[I 2025-11-09 07:07:36,539] Trial 37 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0003920236770788698, 'controller_lr': 0.0001759493521674727, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 178/1319 [00:00<00:00, 1759.94 examples/s]Map:  28%|██▊       | 364/1319 [00:00<00:00, 1814.06 examples/s]Map:  42%|████▏     | 552/1319 [00:00<00:00, 1839.16 examples/s]Map:  56%|█████▌    | 737/1319 [00:00<00:00, 1840.37 examples/s]Map:  70%|███████   | 924/1319 [00:00<00:00, 1848.65 examples/s]Map:  90%|████████▉ | 1181/1319 [00:00<00:00, 1570.49 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1637.44 examples/s]
+[I 2025-11-09 07:10:57,005] Trial 38 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0001826726058934438, 'controller_lr': 0.00014889185922666807, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1750.08 examples/s]Map:  27%|██▋       | 362/1319 [00:00<00:00, 1801.36 examples/s]Map:  42%|████▏     | 549/1319 [00:00<00:00, 1826.02 examples/s]Map:  55%|█████▌    | 732/1319 [00:00<00:00, 1822.65 examples/s]Map:  70%|██████▉   | 918/1319 [00:00<00:00, 1832.11 examples/s]Map:  89%|████████▉ | 1178/1319 [00:00<00:00, 1553.11 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1622.25 examples/s]
+[I 2025-11-09 07:14:17,243] Trial 39 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00046518576818475345, 'controller_lr': 0.00011016413107131804, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 177/1319 [00:00<00:00, 1744.26 examples/s]Map:  27%|██▋       | 360/1319 [00:00<00:00, 1787.11 examples/s]Map:  47%|████▋     | 621/1319 [00:00<00:00, 1756.95 examples/s]Map:  61%|██████    | 801/1319 [00:00<00:00, 1766.62 examples/s]Map:  74%|███████▍  | 980/1319 [00:00<00:00, 1770.40 examples/s]Map:  89%|████████▉ | 1177/1319 [00:00<00:00, 1515.27 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1588.75 examples/s]
+[I 2025-11-09 07:17:37,783] Trial 40 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00022497826277191734, 'controller_lr': 0.0002030996662693134, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 174/1319 [00:00<00:00, 1712.88 examples/s]Map:  27%|██▋       | 355/1319 [00:00<00:00, 1762.33 examples/s]Map:  41%|████      | 538/1319 [00:00<00:00, 1786.96 examples/s]Map:  55%|█████▍    | 721/1319 [00:00<00:00, 1801.27 examples/s]Map:  75%|███████▍  | 988/1319 [00:00<00:00, 1784.27 examples/s]Map:  89%|████████▉ | 1177/1319 [00:00<00:00, 1529.42 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1599.92 examples/s]
+[I 2025-11-09 07:20:57,462] Trial 41 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00011575268261219574, 'controller_lr': 5.155641542358429e-05, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 171/1319 [00:00<00:00, 1685.89 examples/s]Map:  27%|██▋       | 351/1319 [00:00<00:00, 1749.77 examples/s]Map:  40%|████      | 532/1319 [00:00<00:00, 1773.84 examples/s]Map:  54%|█████▍    | 714/1319 [00:00<00:00, 1791.64 examples/s]Map:  68%|██████▊   | 896/1319 [00:00<00:00, 1796.30 examples/s]Map:  82%|████████▏ | 1084/1319 [00:00<00:00, 1506.08 examples/s]Map:  96%|█████████▌| 1266/1319 [00:00<00:00, 1590.96 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1597.89 examples/s]
+[I 2025-11-09 07:24:17,923] Trial 42 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0001332262099726268, 'controller_lr': 7.997998075754369e-05, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 178/1319 [00:00<00:00, 1760.36 examples/s]Map:  28%|██▊       | 366/1319 [00:00<00:00, 1825.42 examples/s]Map:  42%|████▏     | 555/1319 [00:00<00:00, 1849.42 examples/s]Map:  56%|█████▋    | 742/1319 [00:00<00:00, 1854.05 examples/s]Map:  70%|███████   | 928/1319 [00:00<00:00, 1853.96 examples/s]Map:  90%|████████▉ | 1181/1319 [00:00<00:00, 1575.46 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1642.22 examples/s]
+[I 2025-11-09 07:27:38,963] Trial 43 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00015482830450306914, 'controller_lr': 5.8423123397896664e-05, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 175/1319 [00:00<00:00, 1734.74 examples/s]Map:  27%|██▋       | 352/1319 [00:00<00:00, 1735.35 examples/s]Map:  40%|████      | 529/1319 [00:00<00:00, 1745.65 examples/s]Map:  54%|█████▎    | 707/1319 [00:00<00:00, 1754.31 examples/s]Map:  67%|██████▋   | 883/1319 [00:00<00:00, 1753.21 examples/s]Map:  82%|████████▏ | 1087/1319 [00:00<00:00, 1493.30 examples/s]Map:  96%|█████████▌| 1267/1319 [00:00<00:00, 1575.18 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1581.96 examples/s]
+[I 2025-11-09 07:30:59,968] Trial 44 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00010692840113590228, 'controller_lr': 0.00022589463422003332, 'lora_r': 64}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 174/1319 [00:00<00:00, 1714.99 examples/s]Map:  27%|██▋       | 356/1319 [00:00<00:00, 1772.98 examples/s]Map:  41%|████      | 541/1319 [00:00<00:00, 1800.69 examples/s]Map:  55%|█████▍    | 725/1319 [00:00<00:00, 1809.65 examples/s]Map:  69%|██████▉   | 907/1319 [00:00<00:00, 1807.60 examples/s]Map:  89%|████████▉ | 1176/1319 [00:00<00:00, 1547.26 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1606.26 examples/s]
+[I 2025-11-09 07:34:20,722] Trial 45 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0001251286978952172, 'controller_lr': 7.333284693536438e-05, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 172/1319 [00:00<00:00, 1699.44 examples/s]Map:  27%|██▋       | 357/1319 [00:00<00:00, 1775.86 examples/s]Map:  41%|████      | 543/1319 [00:00<00:00, 1808.86 examples/s]Map:  55%|█████▌    | 727/1319 [00:00<00:00, 1818.96 examples/s]Map:  69%|██████▉   | 912/1319 [00:00<00:00, 1824.62 examples/s]Map:  90%|████████▉ | 1181/1319 [00:00<00:00, 1563.98 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1619.65 examples/s]
+[I 2025-11-09 07:37:41,701] Trial 46 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00016508780620291008, 'controller_lr': 0.00036928781617885295, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 167/1319 [00:00<00:00, 1653.89 examples/s]Map:  26%|██▋       | 347/1319 [00:00<00:00, 1736.65 examples/s]Map:  40%|████      | 531/1319 [00:00<00:00, 1779.25 examples/s]Map:  54%|█████▍    | 710/1319 [00:00<00:00, 1779.53 examples/s]Map:  67%|██████▋   | 890/1319 [00:00<00:00, 1782.22 examples/s]Map:  82%|████████▏ | 1087/1319 [00:00<00:00, 1508.87 examples/s]Map:  96%|█████████▌| 1268/1319 [00:00<00:00, 1592.52 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1594.75 examples/s]
+[I 2025-11-09 07:41:01,728] Trial 47 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.0003089569223811003, 'controller_lr': 9.746668550078856e-05, 'lora_r': 96}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 174/1319 [00:00<00:00, 1722.72 examples/s]Map:  27%|██▋       | 354/1319 [00:00<00:00, 1762.52 examples/s]Map:  41%|████      | 537/1319 [00:00<00:00, 1787.88 examples/s]Map:  54%|█████▍    | 718/1319 [00:00<00:00, 1793.71 examples/s]Map:  75%|███████▍  | 985/1319 [00:00<00:00, 1781.78 examples/s]Map:  89%|████████▉ | 1177/1319 [00:00<00:00, 1526.44 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1596.47 examples/s]
+[I 2025-11-09 07:44:22,114] Trial 48 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00014589684098556354, 'controller_lr': 0.000164538004074317, 'lora_r': 32}. Best is trial 0 with value: 0.0.
+Map:   0%|          | 0/1319 [00:00<?, ? examples/s]Map:  13%|█▎        | 175/1319 [00:00<00:00, 1730.26 examples/s]Map:  27%|██▋       | 358/1319 [00:00<00:00, 1782.71 examples/s]Map:  41%|████      | 542/1319 [00:00<00:00, 1805.04 examples/s]Map:  55%|█████▌    | 726/1319 [00:00<00:00, 1814.52 examples/s]Map:  75%|███████▌  | 995/1319 [00:00<00:00, 1798.06 examples/s]Map:  89%|████████▉ | 1178/1319 [00:00<00:00, 1536.42 examples/s]Map: 100%|██████████| 1319/1319 [00:00<00:00, 1610.61 examples/s]
+[I 2025-11-09 07:47:42,428] Trial 49 finished with value: 0.0 and parameters: {'adapter_lr_init': 0.00018924389069973117, 'controller_lr': 0.00024960871349475515, 'lora_r': 96}. Best is trial 0 with value: 0.0.
