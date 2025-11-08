@@ -271,6 +271,9 @@ def main(cfg: DictConfig) -> None:  # noqa: D401
             # Temporarily disable struct mode to allow updates
             OmegaConf.set_struct(cfg, False)
             for hp_name, hp_spec in cfg.optuna.search_space.items():
+                # Skip if hp_spec is None (not defined in run config)
+                if hp_spec is None:
+                    continue
                 if hp_spec.type == "loguniform":
                     val = trial.suggest_float(hp_name, hp_spec.low, hp_spec.high, log=True)
                 elif hp_spec.type == "categorical":
