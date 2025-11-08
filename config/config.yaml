@@ -17,7 +17,11 @@ wandb:
 optuna:
   n_trials: 0
   direction: maximize
-  search_space: {}
+  search_space:
+    adapter_lr_init: null
+    graff_outer_lr: null
+    controller_lr: null
+    lora_r: null
 
 # Dummy defaults – will be overwritten by run-specific YAML.
 model:
