@@ -57,6 +57,8 @@ training:
     controller_lr: null
     stability_guard: null
     warm_start_ckpt: null
+    baseline_decay: null
+    entropy_bonus: null
 
 evaluation:
   interval_steps: 100
