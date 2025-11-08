@@ -101,7 +101,10 @@ def _evaluate(
                 max_new_tokens=max_gen_tokens,
             )
             preds = tokenizer.batch_decode(gen_ids[:, input_ids.size(1):], skip_special_tokens=True)
-            refs = tokenizer.batch_decode(labels, skip_special_tokens=True)
+            # Replace -100 (used for loss masking) with pad_token_id before decoding
+            labels_for_decode = labels.clone()
+            labels_for_decode[labels_for_decode == -100] = tokenizer.pad_token_id
+            refs = tokenizer.batch_decode(labels_for_decode, skip_special_tokens=True)
             for p, r in zip(preds, refs):
                 correct += int(_exact_match(p, r))
             total += len(preds)
