@@ -818,7 +818,46 @@
     "iterations": [
       {
         "iteration_id": 1,
-        "method": "We propose GRAFF (Graph-Recurrent  Allocation  of  Fine-tuning  Funds) – a budget-aware, differentiable LR planner that learns an *entire trajectory* in closed form using one extra forward pass per mini-batch.\n\nA.  Budget-conditioned trajectory encoder\n   • Maintain a latent state h_t updated by a lightweight Graph Neural Net whose nodes are adapter blocks and whose edge features are instantaneous curvature Δλᵢ and entropy Hᵢ after the *first* adapter layer.  This runs in the same forward pass as the loss – no HVPs.\n   • Remaining budget b_t = B – time_so_far is appended to every node feature, letting the network reason about *global* constraints.\n\nB.  Closed-form LR decoder\n   • Decoder is a single linear map W applied to h_t that outputs log η_t and token multipliers m_{t,i}.  Because W is linear, gradients wrt W are available from the normal back-prop of the loss; no REINFORCE needed.\n   • To prevent instability we project W after every update onto the half-space defined by η_t·λ̂_max≤1.9 (edge-of-stability guard).\n\nC.  Self-supervised training objective\n   • We derive the *compute-normalised regret* R_T = (ℒ_T – ℒ_best)/time_T where ℒ_T is running avg loss.  Its gradient wrt W is tractable because both numerator and denominator depend smoothly on W through η_t.\n   • We optimise W with Adam (lr 1e-3) concurrently with model weights: two optimisers, one backward.\n\nD.  Zero-shot transfer & warm start\n   • Pre-train W for 300 steps on GSM8K with tiny (70 M) Qwen-tiny; store weights.  When fine-tuning a new model we warm-start W and keep “outer” optimiser active –  no policy search from scratch.\n\nImplementation is <160 LoC PyTorch; adds one Jacobian-vector product (auto-diff) per step (≈2 % run-time)."
+        "method": "We propose GRAFF (Graph-Recurrent  Allocation  of  Fine-tuning  Funds) – a budget-aware, differentiable LR planner that learns an *entire trajectory* in closed form using one extra forward pass per mini-batch.\n\nA.  Budget-conditioned trajectory encoder\n   • Maintain a latent state h_t updated by a lightweight Graph Neural Net whose nodes are adapter blocks and whose edge features are instantaneous curvature Δλᵢ and entropy Hᵢ after the *first* adapter layer.  This runs in the same forward pass as the loss – no HVPs.\n   • Remaining budget b_t = B – time_so_far is appended to every node feature, letting the network reason about *global* constraints.\n\nB.  Closed-form LR decoder\n   • Decoder is a single linear map W applied to h_t that outputs log η_t and token multipliers m_{t,i}.  Because W is linear, gradients wrt W are available from the normal back-prop of the loss; no REINFORCE needed.\n   • To prevent instability we project W after every update onto the half-space defined by η_t·λ̂_max≤1.9 (edge-of-stability guard).\n\nC.  Self-supervised training objective\n   • We derive the *compute-normalised regret* R_T = (ℒ_T – ℒ_best)/time_T where ℒ_T is running avg loss.  Its gradient wrt W is tractable because both numerator and denominator depend smoothly on W through η_t.\n   • We optimise W with Adam (lr 1e-3) concurrently with model weights: two optimisers, one backward.\n\nD.  Zero-shot transfer & warm start\n   • Pre-train W for 300 steps on GSM8K with tiny (70 M) Qwen-tiny; store weights.  When fine-tuning a new model we warm-start W and keep “outer” optimiser active –  no policy search from scratch.\n\nImplementation is <160 LoC PyTorch; adds one Jacobian-vector product (auto-diff) per step (≈2 % run-time).",
+        "experimental_design": {
+          "experiment_summary": "This experiment evaluates GRAFF—our new, differentiable, budget-aware learning-rate (LR) planner—against a strong token-aware RL baseline (REACTOR) when LoRA-fine-tuning a 0.6-billion-parameter Qwen3 model on the GSM8K mathematics dataset.  \n\nWorkflow\n1. Data loading: GSM8K train/dev is streamed with length-bucketing (batch_size = 64) and mixed-precision (bfloat16).  \n2. Model: Qwen3-0.6B is equipped with LoRA adapters (rank = 64, α = 16) on all self-attention and MLP layers; only adapter weights are trainable.  \n3. GRAFF module: each mini-batch’s forward pass collects two cheap probes per adapter block—logit entropy after the first adapter layer and Hessian-free curvature estimate Δλᵢ.  Node features = [Δλᵢ, Hᵢ, remaining_budget].  A 2-layer message-passing GNN updates the latent state h_t, after which a single linear decoder W outputs (a) global LR η_t for the optimiser and (b) per-token multipliers m_{t,i}.  W is projected after every update to satisfy η_t·λ̂_max ≤ 1.9.  \n4. Joint optimisation: the normal model loss plus the compute-normalised regret R_T is back-propagated once; Adam (lr = 2e-4) updates adapter weights while a second Adam (lr = 1e-3) updates W.  \n5. Budget tracking: wall-clock time is monitored with CUDA events; once 30-min or 60-min budgets are exhausted, training halts and dev exact-match (EM) is recorded.  \n6. Baseline: REACTOR replaces GRAFF but keeps all other settings identical.  \n7. Hyper-parameter search over three key knobs (see below) is done with 50 trials of Optuna using the 30-min EM as the objective.  \n8. Metrics collected: dev EM @30 min (primary), dev EM @60 min, AUC(EM-vs-time)/B, and energy (Joules) read every 5 s from nvidia-smi.  \nThe entire pipeline fits comfortably into an 80 GB A100 (peak ≈34 GB) and <10 GB system RAM per worker; RAM-heavy dataloading is disabled by streaming.",
+          "evaluation_metrics": [
+            "Exact-match accuracy at 30 min wall-clock",
+            "Exact-match accuracy at 60 min wall-clock",
+            "AUC(EM-vs-time)/B",
+            "Energy (Joules)",
+            "Exact-match accuracy at 30 min wall-clock."
+          ],
+          "proposed_method": "GRAFF (Graph-Recurrent Allocation of Fine-tuning Funds) is a learning-rate scheduler that plans an entire training trajectory in closed form while respecting a user-supplied wall-clock budget B.\n\nKey components\n1. Budget-conditioned encoder: Each adapter block is a node in a lightweight graph neural network.  Node features include instantaneous curvature (Δλᵢ) estimated via a single Hessian-vector product, token-level entropy (Hᵢ) after the first adapter layer, and the remaining budget b_t = B – time_so_far.  One message-passing step updates latent states h_t.\n2. Linear decoder: A single weight matrix W maps the mean of h_t to log η_t (global LR) and each h_t to token multipliers m_{t,i}.  Because the decoder is linear, gradients wrt W flow through the normal loss; no REINFORCE or separate controller optimisation is needed.\n3. Stability guard: After every optimiser step, W is projected so that η_t·λ̂_max ≤ 1.9, keeping updates near the edge of stability.\n4. Objective: Compute-normalised regret R_T = (ℒ_T – ℒ_best)/time_T is differentiable in W through η_t, allowing simultaneous optimisation of adapter weights and scheduler parameters with standard back-prop.\n5. Warm-start: W is pre-trained for 300 mini-batches on a 70 M-parameter Qwen-tiny model; the same W is then continuously fine-tuned online when larger models are trained, enabling zero-shot transfer across sizes.\n\nAlgorithmic procedure per mini-batch\n(1) Forward pass through model and probes → collect Δλᵢ, Hᵢ.\n(2) GNN update → h_t.\n(3) Decode (η_t, m_{t,i}); scale optimiser LR and token gradients.\n(4) Backward pass; accumulate gradients of both adapter weights and W.\n(5) Adam steps for both parameter sets; project W; log time & energy.",
+          "comparative_methods": [
+            "REACTOR (RL-based LR scheduler)"
+          ],
+          "models_to_use": [
+            "Qwen3-0.6B"
+          ],
+          "datasets_to_use": [
+            "gsm8k"
+          ],
+          "hyperparameters_to_search": {
+            "adapter_lr_init": "1e-4-5e-4",
+            "graff_outer_lr": "5e-4-2e-3",
+            "LoRA_rank": "32,64,96"
+          }
+        },
+        "experiment_runs": [
+          {
+            "run_id": "proposed-iter1-Qwen3-0.6B-gsm8k",
+            "method_name": "proposed",
+            "model_name": "Qwen3-0.6B",
+            "dataset_name": "gsm8k"
+          },
+          {
+            "run_id": "comparative-1-iter1-Qwen3-0.6B-gsm8k",
+            "method_name": "comparative-1",
+            "model_name": "Qwen3-0.6B",
+            "dataset_name": "gsm8k"
+          }
+        ]
       }
     ]
   }
