@@ -20,11 +20,47 @@ optuna:
   search_space: {}
 
 # Dummy defaults – will be overwritten by run-specific YAML.
-model: {}
-dataset: {}
-training: {}
+model:
+  name: null
+  dtype: null
+  lora:
+    r: null
+    alpha: null
+    dropout: null
+  parameter_count: null
+
+dataset:
+  name: null
+  train_split: null
+  eval_split: null
+  max_tokens: null
+  streaming: null
+  shuffle_buffer: null
+
+training:
+  budget_minutes: null
+  global_batch_size: null
+  micro_batch_size: null
+  gradient_accumulation_steps: null
+  total_steps: null
+  mixed_precision: null
+  gradient_checkpointing: null
+  clip_grad_norm: null
+  optimizer:
+    type: null
+    lr_init: null
+    betas: null
+    weight_decay: null
+  scheduler:
+    type: null
+    outer_lr: null
+    controller_lr: null
+    stability_guard: null
+    warm_start_ckpt: null
+
 evaluation:
   interval_steps: 100
+  metrics: null
 
 hydra:
   run:
