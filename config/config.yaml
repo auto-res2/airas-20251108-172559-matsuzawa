@@ -4,6 +4,8 @@
 
 # The *run* will be merged in at runtime by src.main/src.train.
 run: null          # to be overridden: run=<run_id>
+run_id: null       # to be set by run-specific YAML
+method: null       # to be set by run-specific YAML (proposed/comparative)
 mode: full         # trial | full
 results_dir: ./results
 
