@@ -180,7 +180,7 @@ def _train_single_run(cfg: DictConfig) -> None:
         attention_mask = batch["attention_mask"].to(device)
         labels = batch["labels"].to(device)
 
-        with torch.cuda.amp.autocast(enabled=cfg.training.mixed_precision in ("fp16", "bf16")):
+        with torch.amp.autocast('cuda', enabled=cfg.training.mixed_precision in ("fp16", "bf16")):
             outputs = model(
                 input_ids=input_ids,
                 attention_mask=attention_mask,

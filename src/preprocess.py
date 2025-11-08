@@ -25,11 +25,24 @@ def _tokenise_function(example, tokenizer: AutoTokenizer, cfg: DictConfig):
     prompt = example.get("question", "")
     # GSM8K answers are inside `answer` key preceded by `#### `
     answer = example.get("answer", "")
-    # Build input = question only (teacher forcing on target)
-    model_input = tokenizer(prompt, truncation=True, max_length=cfg.dataset.max_tokens)
-    with tokenizer.as_target_tokenizer():  # type: ignore[attr-defined]
-        label_out = tokenizer(answer, truncation=True, max_length=cfg.dataset.max_tokens)
-    model_input["labels"] = label_out["input_ids"]
+
+    # Concatenate question and answer for causal LM training
+    full_text = prompt + " " + answer
+
+    # Tokenize the full sequence
+    model_input = tokenizer(full_text, truncation=True, max_length=cfg.dataset.max_tokens)
+
+    # For labels, we want to predict the answer tokens only
+    # First tokenize the prompt to know where it ends
+    prompt_tokens = tokenizer(prompt, truncation=True, max_length=cfg.dataset.max_tokens)
+    prompt_length = len(prompt_tokens["input_ids"])
+
+    # Create labels: -100 for prompt tokens (ignored in loss), actual tokens for answer
+    labels = [-100] * prompt_length + model_input["input_ids"][prompt_length:]
+
+    # Ensure labels match the length of input_ids
+    model_input["labels"] = labels[:len(model_input["input_ids"])]
+
     return model_input
 
 
@@ -69,7 +82,7 @@ def build_dataloaders(cfg: DictConfig):
     # ------------------------- torch DataLoader -----------------------------
     def _collate(batch):
         input_ids = [torch.tensor(d["input_ids"]) for d in batch]
-        labels = [torch.tensor(d["labels"]) for d in batch]
+        labels = [torch.tensor(d["labels"], dtype=torch.long) for d in batch]
         input_ids = torch.nn.utils.rnn.pad_sequence(input_ids, batch_first=True, padding_value=tokenizer.pad_token_id)
         labels = torch.nn.utils.rnn.pad_sequence(labels, batch_first=True, padding_value=-100)
         attention_mask = (input_ids != tokenizer.pad_token_id).long()
