@@ -1,0 +1,356 @@
+
+LLM Name: o3-2025-04-16
+Input:
+You are an AI code reviewer validating production-ready experiment code for research papers.
+
+Analyze the provided experiment code and determine if it meets all requirements for immediate execution in research experiments.
+
+# Instructions
+
+## Core Validation Criteria
+Check if the generated experiment code meets ALL of the following requirements:
+
+1. **Complete Implementation**:
+   - Every component is fully functional, production-ready, publication-worthy code
+   - No "omitted for brevity", no "simplified version", no TODO, PLACEHOLDER, pass, or ...
+   - All functions and classes are completely implemented
+   - No truncated code sections or incomplete implementations
+
+2. **Hydra Integration**:
+   - Uses Hydra to manage all experiment configurations from `config/runs/*.yaml` files
+   - All parameters are loaded from run configs dynamically
+   - Proper configuration structure with run_id, method, model, dataset, training, and optuna sections
+   - CLI interface matches:
+     * Training (full): `uv run python -u -m src.main run={run_id} results_dir={path} mode=full`
+     * Training (trial): `uv run python -u -m src.main run={run_id} results_dir={path} mode=trial`
+     * Evaluation: `uv run python -m src.evaluate results_dir={path} run_ids='["run-1", "run-2", ...]'` (independent execution)
+   - Code must automatically configure based on mode:
+     * When `cfg.mode == "trial"`: Set `cfg.wandb.mode = "disabled"`, `cfg.optuna.n_trials = 0`, epochs=1
+     * When `cfg.mode == "full"`: Set `cfg.wandb.mode = "online"` and use full configuration
+
+3. **Complete Data Pipeline**:
+   - Full data loading and preprocessing implementation
+   - Dataset-specific preprocessing is properly implemented
+   - No placeholder dataset loading code
+   - Proper error handling for data operations
+   - Uses `.cache/` as the cache directory for all datasets and models
+
+4. **Model Implementation**:
+   - Complete model architectures for all methods (proposed and comparative methods)
+   - No placeholders (TODO, PLACEHOLDER, pass, or incomplete implementations)
+   - When External Resources specify HuggingFace models: properly use and customize them (acceptable to wrap AutoModel, add adapters, etc.)
+   - When no external models specified: implement architectures from scratch using PyTorch primitives
+   - Model-specific configurations correctly applied
+   - Proper PyTorch usage throughout
+
+5. **File Structure Compliance**:
+   - Contains EXACTLY these required files (and NO other files):
+     * `src/train.py`
+     * `src/evaluate.py`
+     * `src/preprocess.py`
+     * `src/model.py`
+     * `src/main.py`
+     * `pyproject.toml`
+     * `config/config.yaml`
+   - NO additional files (e.g., NO `src/__init__.py`, NO `setup.py`, NO other Python files)
+   - No missing files from the structure
+   - All functionality contained within specified files
+
+6. **WandB Integration**:
+   - train.py initializes WandB and logs ALL metrics comprehensively:
+     * Use `wandb.log()` at each training step/batch/epoch with ALL relevant time-series metrics
+     * Log as frequently as possible (per-batch or per-epoch) to capture complete training dynamics
+     * Use `wandb.summary["key"] = value` to save final/best metrics (best_val_acc, final_test_acc, best_epoch, etc.)
+     * Metric names in train.py's wandb.log() MUST exactly match the keys used in evaluate.py's run.history()
+   - Optuna Integration: If using Optuna, DO NOT log intermediate trial results to WandB - only log the final run with best hyperparameters
+   - Code must automatically configure based on mode:
+     * When `cfg.mode == "trial"`: Set `cfg.wandb.mode = "disabled"` before any WandB operations
+     * When `cfg.mode == "full"`: Set `cfg.wandb.mode = "online"` before any WandB operations
+   - NO results.json or stdout JSON dumps in train.py
+   - config/config.yaml contains mandatory WandB settings (entity/project)
+   - `WANDB_API_KEY` environment variable is available for authentication
+
+7. **Configuration Files**:
+   - The generated code properly references config files via Hydra
+   - NOTE: config/runs/{run_id}.yaml files are provided separately (not in ExperimentCode)
+   - All run configurations match the experiment_runs provided
+   - Optuna search spaces are properly defined if applicable
+
+8. **Evaluation Script Independence**:
+   - evaluate.py is executed independently via `uv run python -m src.evaluate results_dir={path} run_ids='["run-1", "run-2"]'`
+   - Accepts `run_ids` parameter as JSON string list (parse with `json.loads(args.run_ids)`)
+   - main.py DOES NOT call evaluate.py
+   - evaluate.py loads WandB config from `config/config.yaml` (in repository root)
+   - evaluate.py retrieves comprehensive data from WandB API:
+     * Use `wandb.Api()` to get run data: `run = api.run(f"{entity}/{project}/{run_id}")`
+     * Retrieve: `history = run.history()`, `summary = run.summary._json_dict`, `config = dict(run.config)`
+   - **STEP 1: Per-Run Processing** (for each run_id):
+     * Export comprehensive run-specific metrics to: `{results_dir}/{run_id}/metrics.json`
+     * Generate run-specific figures (learning curves, confusion matrices) to: `{results_dir}/{run_id}/`
+     * Each run should have its own subdirectory with its metrics and figures
+   - **STEP 2: Aggregated Analysis** (after processing all runs):
+     * Export aggregated metrics to: `{results_dir}/comparison/aggregated_metrics.json` with the following structure:
+       ```json
+       {
+         "primary_metric": "Exact-match accuracy at 30 min wall-clock.",
+         "metrics": {
+           "metric_name_1": {"run_id_1": value1, "run_id_2": value2, ...},
+           "metric_name_2": {"run_id_1": value1, "run_id_2": value2, ...}
+         },
+         "best_proposed": {
+           "run_id": "proposed-iter2-model-dataset",
+           "value": 0.92
+         },
+         "best_baseline": {
+           "run_id": "comparative-1-model-dataset",
+           "value": 0.88
+         },
+         "gap": 4.55
+       }
+       ```
+       The structure must include:
+       - "primary_metric": The primary evaluation metric name from the hypothesis
+       - "metrics": All collected metrics organized by metric name, then by run_id
+       - "best_proposed": The run_id and value of the proposed method with the best primary_metric performance (run_id contains "proposed")
+       - "best_baseline": The run_id and value of the baseline/comparative method with the best primary_metric performance (run_id contains "comparative" or "baseline")
+       - "gap": Performance gap calculated as: (best_proposed.value - best_baseline.value) / best_baseline.value * 100
+         * Must use the expected results from the hypothesis to determine metric direction (higher vs lower is better)
+         * If the metric should be minimized, reverse the sign of the gap
+         * The gap represents the percentage improvement of the proposed method over the best baseline
+     * Generate comparison figures to: `{results_dir}/comparison/`
+     * Cross-run comparison charts (bar charts, box plots)
+     * Performance metrics tables
+     * Statistical significance tests
+   - Proper figure quality: legends, annotations, tight_layout
+   - Follows GLOBALLY UNIQUE naming convention to prevent collisions:
+     * Per-run figures: `{run_id}_{figure_topic}[_<condition>][_pairN].pdf` (e.g., `run-1-proposed-bert-glue_learning_curve.pdf`)
+     * Comparison figures: `comparison_{figure_topic}[_<condition>][_pairN].pdf` (e.g., `comparison_accuracy_bar_chart.pdf`)
+   - train.py and main.py generate NO figures
+   - evaluate.py cannot run in trial_mode (no WandB data available when WandB disabled)
+
+9. **Mode-Based Implementation**:
+   - `mode` parameter controls experiment behavior (required parameter)
+   - When `cfg.mode == "trial"`:
+     * Properly reduces computational load: epochs=1, batches limited to 1-2, Optuna disabled (n_trials=0), small evaluation subset
+     * Automatically sets `cfg.wandb.mode = "disabled"`
+     * Purpose: Fast validation that code runs without errors
+   - When `cfg.mode == "full"`:
+     * Automatically sets `cfg.wandb.mode = "online"`
+     * Uses full configuration (full epochs, full Optuna trials, etc.)
+
+## Output Format
+Respond with a JSON object containing:
+- `is_code_ready`: boolean - true if ALL criteria are met, false otherwise
+- `code_issue`: string - specific issues found if any criteria are not met, focusing on what needs to be fixed
+
+# Hypothesis
+open_problems='1.  Current LR schedulers for PEFT treat every training step in isolation.  However, GSM8K fine-tuning lasts only ≈2 000 optimiser steps, so step–to–step LR correlations dominate final accuracy.  No method explicitly *models* these correlations or re-uses experience collected on earlier budgets.\n2.  Token-level difficulty is visible before the backward pass through inexpensive forward-only probes (e.g. logit entropy after the **first** adapter layer).  Existing token-aware tuners (BATS) wait until the full backward pass finishes, missing a chance to scale the *next* gradient.\n3.  Compute budgets in practice are often set *per experiment* (e.g. “one hour on one A100”), not per step.  Scheduling should optimise the *entire training trajectory* under a user-supplied wall-clock budget B without the need for k-step roll-outs or quadratic programming.\n4.  Even the best RL-based controller (REACTOR) needs policy-gradient updates with high-variance rewards and hand-picked baselines; this slows convergence and couples the tuner’s learning rate to the very problem it tries to solve.' method='We propose GRAFF (Graph-Recurrent  Allocation  of  Fine-tuning  Funds) – a budget-aware, differentiable LR planner that learns an *entire trajectory* in closed form using one extra forward pass per mini-batch.\n\nA.  Budget-conditioned trajectory encoder\n   • Maintain a latent state h_t updated by a lightweight Graph Neural Net whose nodes are adapter blocks and whose edge features are instantaneous curvature Δλᵢ and entropy Hᵢ after the *first* adapter layer.  This runs in the same forward pass as the loss – no HVPs.\n   • Remaining budget b_t = B – time_so_far is appended to every node feature, letting the network reason about *global* constraints.\n\nB.  Closed-form LR decoder\n   • Decoder is a single linear map W applied to h_t that outputs log η_t and token multipliers m_{t,i}.  Because W is linear, gradients wrt W are available from the normal back-prop of the loss; no REINFORCE needed.\n   • To prevent instability we project W after every update onto the half-space defined by η_t·λ̂_max≤1.9 (edge-of-stability guard).\n\nC.  Self-supervised training objective\n   • We derive the *compute-normalised regret* R_T = (ℒ_T – ℒ_best)/time_T where ℒ_T is running avg loss.  Its gradient wrt W is tractable because both numerator and denominator depend smoothly on W through η_t.\n   • We optimise W with Adam (lr 1e-3) concurrently with model weights: two optimisers, one backward.\n\nD.  Zero-shot transfer & warm start\n   • Pre-train W for 300 steps on GSM8K with tiny (70 M) Qwen-tiny; store weights.  When fine-tuning a new model we warm-start W and keep “outer” optimiser active –  no policy search from scratch.\n\nImplementation is <160 LoC PyTorch; adds one Jacobian-vector product (auto-diff) per step (≈2 % run-time).' experimental_setup='Models: Qwen3-0.6B-Chat (primary) and Mistral-7B-Instruct (transfer) with LoRA r=64.\nData: GSM8K train/dev; GSM1k for contamination test.\nBudgets: 30 min and 60 min on single A100-80 GB (wall-clock, include eval).\nBaselines: Fixed LR, SALeLR, BATS, REACTOR (all tuned), plus human-tuned cosine.\nMetrics: 1) dev EM at budget B; 2) AUC(EM-vs-time)/B; 3) energy (Joules) from nvidia-smi.\nAblations: (a) remove graph edges → MLP; (b) remove budget feature; (c) freeze W (no online).' primary_metric='Exact-match accuracy at 30 min wall-clock.' experimental_code='# GRAFF – core\nclass GNN(nn.Module):\n    def __init__(self,d):\n        super().__init__(); self.msg=nn.Linear(d*2,64); self.up=nn.GRUCell(64,d)\n    def forward(self,x,adj):\n        m=self.msg(torch.cat([x[adj[0]],x[adj[1]]],-1))\n        agg=torch.zeros_like(x); agg.index_add_(0,adj[1],m)\n        return self.up(agg.reshape(-1,x.size(-1)),x.reshape(-1,x.size(-1))).view_as(x)\nclass Graff(nn.Module):\n    def __init__(self,blocks):\n        super().__init__(); self.h=nn.Parameter(torch.zeros(len(blocks),16));\n        self.gnn=GNN(16); self.W=nn.Linear(16,1)\n    def forward(self,curv,entr,budget,adj):\n        x=torch.cat([curv,entr,budget.expand_as(curv)],-1)\n        self.h=self.gnn(self.h+x,adj)\n        eta=torch.exp(self.W(self.h.mean(0)))\n        m=torch.sigmoid(self.W(self.h)).squeeze()\n        return eta,m\n' expected_result='Dev EM @30 min: Fixed-LR 74 %, SALeLR 84 %, BATS 88.5 %, REACTOR 90.8 %, GRAFF 92.4 ± 0.2 %.\nEnergy usage to reach 90 % EM: REACTOR 1.00 ×, GRAFF 0.83 ×.\nAUC improves 22 % over REACTOR.\nZero-shot on Mistral-7B: +1.8 pp EM vs REACTOR with same W.' expected_conclusion='By replacing high-variance RL with a differentiable graph-recurrent encoder/decoder conditioned on remaining wall-clock budget, GRAFF learns an end-to-end compute-aware LR trajectory in closed form.  It exploits cheap early-layer entropy to pre-scale gradients, respects global time constraints, and transfers across model sizes, achieving superior EM per Joule without external solvers or policy-gradient tuning.'
+
+# Current Research Method
+We propose GRAFF (Graph-Recurrent  Allocation  of  Fine-tuning  Funds) – a budget-aware, differentiable LR planner that learns an *entire trajectory* in closed form using one extra forward pass per mini-batch.
+
+A.  Budget-conditioned trajectory encoder
+   • Maintain a latent state h_t updated by a lightweight Graph Neural Net whose nodes are adapter blocks and whose edge features are instantaneous curvature Δλᵢ and entropy Hᵢ after the *first* adapter layer.  This runs in the same forward pass as the loss – no HVPs.
+   • Remaining budget b_t = B – time_so_far is appended to every node feature, letting the network reason about *global* constraints.
+
+B.  Closed-form LR decoder
+   • Decoder is a single linear map W applied to h_t that outputs log η_t and token multipliers m_{t,i}.  Because W is linear, gradients wrt W are available from the normal back-prop of the loss; no REINFORCE needed.
+   • To prevent instability we project W after every update onto the half-space defined by η_t·λ̂_max≤1.9 (edge-of-stability guard).
+
+C.  Self-supervised training objective
+   • We derive the *compute-normalised regret* R_T = (ℒ_T – ℒ_best)/time_T where ℒ_T is running avg loss.  Its gradient wrt W is tractable because both numerator and denominator depend smoothly on W through η_t.
+   • We optimise W with Adam (lr 1e-3) concurrently with model weights: two optimisers, one backward.
+
+D.  Zero-shot transfer & warm start
+   • Pre-train W for 300 steps on GSM8K with tiny (70 M) Qwen-tiny; store weights.  When fine-tuning a new model we warm-start W and keep “outer” optimiser active –  no policy search from scratch.
+
+Implementation is <160 LoC PyTorch; adds one Jacobian-vector product (auto-diff) per step (≈2 % run-time).
+
+# Experimental Design
+- Strategy: This experiment evaluates GRAFF—our new, differentiable, budget-aware learning-rate (LR) planner—against a strong token-aware RL baseline (REACTOR) when LoRA-fine-tuning a 0.6-billion-parameter Qwen3 model on the GSM8K mathematics dataset.  
+
+Workflow
+1. Data loading: GSM8K train/dev is streamed with length-bucketing (batch_size = 64) and mixed-precision (bfloat16).  
+2. Model: Qwen3-0.6B is equipped with LoRA adapters (rank = 64, α = 16) on all self-attention and MLP layers; only adapter weights are trainable.  
+3. GRAFF module: each mini-batch’s forward pass collects two cheap probes per adapter block—logit entropy after the first adapter layer and Hessian-free curvature estimate Δλᵢ.  Node features = [Δλᵢ, Hᵢ, remaining_budget].  A 2-layer message-passing GNN updates the latent state h_t, after which a single linear decoder W outputs (a) global LR η_t for the optimiser and (b) per-token multipliers m_{t,i}.  W is projected after every update to satisfy η_t·λ̂_max ≤ 1.9.  
+4. Joint optimisation: the normal model loss plus the compute-normalised regret R_T is back-propagated once; Adam (lr = 2e-4) updates adapter weights while a second Adam (lr = 1e-3) updates W.  
+5. Budget tracking: wall-clock time is monitored with CUDA events; once 30-min or 60-min budgets are exhausted, training halts and dev exact-match (EM) is recorded.  
+6. Baseline: REACTOR replaces GRAFF but keeps all other settings identical.  
+7. Hyper-parameter search over three key knobs (see below) is done with 50 trials of Optuna using the 30-min EM as the objective.  
+8. Metrics collected: dev EM @30 min (primary), dev EM @60 min, AUC(EM-vs-time)/B, and energy (Joules) read every 5 s from nvidia-smi.  
+The entire pipeline fits comfortably into an 80 GB A100 (peak ≈34 GB) and <10 GB system RAM per worker; RAM-heavy dataloading is disabled by streaming.
+- Proposed Method: GRAFF (Graph-Recurrent Allocation of Fine-tuning Funds) is a learning-rate scheduler that plans an entire training trajectory in closed form while respecting a user-supplied wall-clock budget B.
+
+Key components
+1. Budget-conditioned encoder: Each adapter block is a node in a lightweight graph neural network.  Node features include instantaneous curvature (Δλᵢ) estimated via a single Hessian-vector product, token-level entropy (Hᵢ) after the first adapter layer, and the remaining budget b_t = B – time_so_far.  One message-passing step updates latent states h_t.
+2. Linear decoder: A single weight matrix W maps the mean of h_t to log η_t (global LR) and each h_t to token multipliers m_{t,i}.  Because the decoder is linear, gradients wrt W flow through the normal loss; no REINFORCE or separate controller optimisation is needed.
+3. Stability guard: After every optimiser step, W is projected so that η_t·λ̂_max ≤ 1.9, keeping updates near the edge of stability.
+4. Objective: Compute-normalised regret R_T = (ℒ_T – ℒ_best)/time_T is differentiable in W through η_t, allowing simultaneous optimisation of adapter weights and scheduler parameters with standard back-prop.
+5. Warm-start: W is pre-trained for 300 mini-batches on a 70 M-parameter Qwen-tiny model; the same W is then continuously fine-tuned online when larger models are trained, enabling zero-shot transfer across sizes.
+
+Algorithmic procedure per mini-batch
+(1) Forward pass through model and probes → collect Δλᵢ, Hᵢ.
+(2) GNN update → h_t.
+(3) Decode (η_t, m_{t,i}); scale optimiser LR and token gradients.
+(4) Backward pass; accumulate gradients of both adapter weights and W.
+(5) Adam steps for both parameter sets; project W; log time & energy.
+- Evaluation Metrics: ['Exact-match accuracy at 30 min wall-clock', 'Exact-match accuracy at 60 min wall-clock', 'AUC(EM-vs-time)/B', 'Energy (Joules)', 'Exact-match accuracy at 30 min wall-clock.']
+
+# Experiment Runs
+
+- Run ID: proposed-iter1-Qwen3-0.6B-gsm8k
+  Method: proposed
+  Model: Qwen3-0.6B
+  Dataset: gsm8k
+  
+  Config Content:
+  ```yaml
+  run_id: proposed-iter1-Qwen3-0.6B-gsm8k
+method: proposed  # GRAFF scheduler
+model:
+  name: Qwen/Qwen3-0.6B
+  dtype: bfloat16
+  lora:
+    r: 64            # LoRA rank
+    alpha: 16
+    dropout: 0.05
+  parameter_count: 0.6B
+
+dataset:
+  name: openai/gsm8k
+  train_split: train
+  eval_split: test
+  max_tokens: 2048
+  streaming: true
+  shuffle_buffer: 10000
+
+training:
+  budget_minutes: 30            # wall-clock budget B
+  global_batch_size: 64         # after gradient accumulation
+  micro_batch_size: 8
+  gradient_accumulation_steps: 8
+  total_steps: 2000             # safety cap; early-stop by budget
+  mixed_precision: bf16
+  gradient_checkpointing: true
+  clip_grad_norm: 1.0
+
+  optimizer:
+    type: adamw
+    lr_init: 2e-4               # will be rescaled by GRAFF
+    betas: [0.9, 0.98]
+    weight_decay: 0.01
+
+  scheduler:
+    type: graff
+    outer_lr: 1e-3              # Adam lr for W
+    stability_guard: 1.9        # η·λ̂_max ≤ 1.9
+    warm_start_ckpt: graff_pretrain_qwen_tiny.pt
+
+evaluation:
+  interval_steps: 100
+  metrics:
+    - exact_match
+
+optuna:
+  n_trials: 50
+  direction: maximize
+  search_space:
+    adapter_lr_init:
+      type: loguniform
+      low: 1.0e-4
+      high: 5.0e-4
+    graff_outer_lr:
+      type: loguniform
+      low: 5.0e-4
+      high: 2.0e-3
+    lora_r:
+      type: categorical
+      choices: [32, 64, 96]
+
+  ```
+  
+
+- Run ID: comparative-1-iter1-Qwen3-0.6B-gsm8k
+  Method: comparative-1
+  Model: Qwen3-0.6B
+  Dataset: gsm8k
+  
+  Config Content:
+  ```yaml
+  run_id: comparative-1-iter1-Qwen3-0.6B-gsm8k
+method: comparative-1  # REACTOR RL scheduler
+model:
+  name: Qwen/Qwen3-0.6B
+  dtype: bfloat16
+  lora:
+    r: 64
+    alpha: 16
+    dropout: 0.05
+  parameter_count: 0.6B
+
+dataset:
+  name: openai/gsm8k
+  train_split: train
+  eval_split: test
+  max_tokens: 2048
+  streaming: true
+  shuffle_buffer: 10000
+
+training:
+  budget_minutes: 30
+  global_batch_size: 64
+  micro_batch_size: 8
+  gradient_accumulation_steps: 8
+  total_steps: 2000
+  mixed_precision: bf16
+  gradient_checkpointing: true
+  clip_grad_norm: 1.0
+
+  optimizer:
+    type: adamw
+    lr_init: 2e-4            # initial LR before REACTOR scaling
+    betas: [0.9, 0.98]
+    weight_decay: 0.01
+
+  scheduler:
+    type: reactor
+    controller_lr: 1e-4      # policy-gradient step size
+    baseline_decay: 0.99     # EMA baseline for REINFORCE
+    entropy_bonus: 0.01
+
+evaluation:
+  interval_steps: 100
+  metrics:
+    - exact_match
+
+optuna:
+  n_trials: 50
+  direction: maximize
+  search_space:
+    adapter_lr_init:
+      type: loguniform
+      low: 1.0e-4
+      high: 5.0e-4
+    controller_lr:
+      type: loguniform
+      low: 5.0e-5
+      high: 5.0e-4
+    lora_r:
+      type: categorical
+      choices: [32, 64, 96]
+
+  ```
+  
+
+
+# Generated Experiment Code (To be validated)
+{"config_yaml": "defaults:\n  - _self_\n\nrun: null      # will be provided from CLI (e.g. run=proposed-iter1-Qwen3-0.6B-gsm8k)\nmode: full     # full | trial\nresults_dir: ./outputs\n\nwandb:\n  entity: gengaru617-personal\n  project: 2025-1108-1\n  mode: online\n\n# Placeholder Optuna \u2013 will be overridden by run-specific config\noptuna:\n  n_trials: 0\n  direction: maximize\n  search_space: {}\n", "evaluate_py": "import argparse\nimport json\nfrom pathlib import Path\n\nimport matplotlib.pyplot as plt\nimport seaborn as sns\nimport pandas as pd\nimport numpy as np\nimport wandb\n\nPRIMARY_METRIC = \"Exact-match accuracy at 30 min wall-clock.\"\n\n\n# ------------------------------- Helpers ---------------------------------- #\n\ndef save_json(obj, path: Path):\n    path.parent.mkdir(parents=True, exist_ok=True)\n    with open(path, \"w\") as f:\n        json.dump(obj, f, indent=2)\n\n\ndef per_run_figures(run_id: str, history: pd.DataFrame, out_dir: Path):\n    # Learning curve figure\n    if \"dev_exact_match\" not in history.columns:\n        return []\n    fig, ax = plt.subplots(figsize=(6, 4))\n    history.plot(x=\"step\", y=\"dev_exact_match\", ax=ax)\n    ax.set_title(f\"Dev EM \u2013 {run_id}\")\n    ax.set_xlabel(\"Step\")\n    ax.set_ylabel(\"Exact-match (%)\")\n    fig.tight_layout()\n    fname = out_dir / f\"{run_id}_learning_curve.pdf\"\n    fig.savefig(fname)\n    plt.close(fig)\n    return [fname]\n\n\ndef comparison_bar(metric_dict: dict, out_dir: Path):\n    metrics = []\n    for run_id, val in metric_dict.items():\n        metrics.append({\"run_id\": run_id, \"value\": val})\n    df = pd.DataFrame(metrics)\n    plt.figure(figsize=(8, 4))\n    sns.barplot(data=df, x=\"run_id\", y=\"value\")\n    plt.xticks(rotation=45, ha=\"right\")\n    plt.ylabel(PRIMARY_METRIC)\n    plt.tight_layout()\n    fname = out_dir / \"comparison_primary_metric_bar.pdf\"\n    plt.savefig(fname)\n    plt.close()\n    return fname\n\n\n# ------------------------------- Main ------------------------------------- #\n\ndef main():\n    parser = argparse.ArgumentParser()\n    parser.add_argument(\"results_dir\", type=str)\n    parser.add_argument(\"run_ids\", type=str, help=\"JSON list string of run IDs\")\n    args = parser.parse_args()\n\n    run_ids = json.loads(args.run_ids)\n    results_root = Path(args.results_dir)\n    api = wandb.Api()\n\n    aggregated = {\"primary_metric\": PRIMARY_METRIC, \"metrics\": {}}\n\n    per_run_metric = {}\n\n    for rid in run_ids:\n        run = api.run(f\"gengaru617-personal/2025-1108-1/{rid}\")\n        history = run.history()\n        summary = run.summary._json_dict\n        config = dict(run.config)\n\n        run_dir = results_root / rid\n        run_dir.mkdir(parents=True, exist_ok=True)\n\n        # Save metrics\n        metrics_path = run_dir / \"metrics.json\"\n        save_json({\"history\": history.to_dict(orient=\"list\"), \"summary\": summary, \"config\": config}, metrics_path)\n\n        # Figures\n        figs = per_run_figures(rid, history, run_dir)\n        for f in figs:\n            print(f)\n\n        # Record primary metric (expect saved as \u0027final_dev_em\u0027)\n        primary_val = summary.get(\"final_dev_em\", 0.0)\n        per_run_metric[rid] = primary_val\n\n        # Collect all metrics for aggregation\n        for key, value in summary.items():\n            aggregated[\"metrics\"].setdefault(key, {})[rid] = value\n\n    # Determine best runs\n    best_prop_val = -np.inf\n    best_prop_id = \"\"\n    best_base_val = -np.inf\n    best_base_id = \"\"\n    for rid, val in per_run_metric.items():\n        if \"proposed\" in rid and val \u003e best_prop_val:\n            best_prop_val = val\n            best_prop_id = rid\n        if (\"comparative\" in rid or \"baseline\" in rid) and val \u003e best_base_val:\n            best_base_val = val\n            best_base_id = rid\n\n    gap = ((best_prop_val - best_base_val) / (best_base_val + 1e-8)) * 100.0\n\n    aggregated[\"best_proposed\"] = {\"run_id\": best_prop_id, \"value\": best_prop_val}\n    aggregated[\"best_baseline\"] = {\"run_id\": best_base_id, \"value\": best_base_val}\n    aggregated[\"gap\"] = gap\n\n    comp_dir = results_root / \"comparison\"\n    comp_dir.mkdir(parents=True, exist_ok=True)\n    save_json(aggregated, comp_dir / \"aggregated_metrics.json\")\n\n    bar_fig = comparison_bar(per_run_metric, comp_dir)\n    print(bar_fig)\n\n\nif __name__ == \"__main__\":\n    main()\n", "main_py": "import os\nimport subprocess\nfrom pathlib import Path\n\nimport hydra\nfrom omegaconf import DictConfig, OmegaConf\nfrom hydra.utils import get_original_cwd\n\n\n@hydra.main(config_path=\"../config\", config_name=\"config\")\ndef main(cfg: DictConfig):\n    cwd = Path(get_original_cwd())\n    run_cfg_path = cwd / \"config\" / \"runs\" / f\"{cfg.run}.yaml\"\n    if not run_cfg_path.exists():\n        raise FileNotFoundError(f\"Run config not found: {run_cfg_path}\")\n\n    # Construct command to launch training as subprocess (Hydra again inside)\n    python_exec = os.getenv(\"PYTHON\", \"python\")\n    cmd = [\n        python_exec,\n        \"-u\",\n        \"-m\",\n        \"src.train\",\n        f\"run={cfg.run}\",\n        f\"mode={cfg.mode}\",\n    ]\n    if \"results_dir\" in cfg:\n        cmd.append(f\"results_dir={cfg.results_dir}\")\n\n    print(\"[main] Launching:\", \" \".join(cmd))\n    subprocess.run(cmd, check=True)\n\n\nif __name__ == \"__main__\":\n    main()\n", "model_py": "import math\nfrom typing import Tuple, List\n\nimport torch\nimport torch.nn as nn\nimport torch.nn.functional as F\nfrom transformers import AutoModelForCausalLM, AutoTokenizer\nfrom peft import LoraConfig, get_peft_model\n\n\n# --------------------------- Model builder -------------------------------- #\n\ndef build_model(model_cfg):\n    tokenizer = AutoTokenizer.from_pretrained(\n        model_cfg.name, cache_dir=\".cache/\", trust_remote_code=True\n    )\n    model = AutoModelForCausalLM.from_pretrained(\n        model_cfg.name,\n        torch_dtype=torch.bfloat16 if str(model_cfg.dtype).lower().startswith(\"bf\") else None,\n        device_map=\"auto\",\n        cache_dir=\".cache/\",\n        trust_remote_code=True,\n    )\n\n    # ---------------- LoRA adapters ----------------\n    lora_cfg = LoraConfig(\n        r=model_cfg.lora.r,\n        lora_alpha=model_cfg.lora.alpha,\n        target_modules=[\n            \"q_proj\",\n            \"v_proj\",\n            \"k_proj\",\n            \"o_proj\",\n            \"up_proj\",\n            \"down_proj\",\n        ],\n        lora_dropout=model_cfg.lora.dropout,\n    )\n    model = get_peft_model(model, lora_cfg)\n    return model, tokenizer\n\n\n# ------------------------- Helper statistics ------------------------------ #\n\ndef compute_token_entropy(logits: torch.Tensor) -\u003e torch.Tensor:\n    \"\"\"Return per-token entropy averaged across batch (shape: [seq_len]).\"\"\"\n    probs = F.softmax(logits, dim=-1)\n    log_probs = torch.log(probs + 1e-12)\n    ent = -(probs * log_probs).sum(-1).mean(0)  # [seq_len]\n    return ent.detach()\n\n\ndef compute_curvature(model) -\u003e torch.Tensor:\n    \"\"\"Simple approximation: L2 norm of gradients of LoRA weights per adapter.\"\"\"\n    norms = []\n    for n, p in model.named_parameters():\n        if \"lora_A\" in n or \"lora_B\" in n:\n            if p.grad is None:\n                norms.append(torch.tensor(0.0, device=p.device))\n            else:\n                norms.append(p.grad.detach().pow(2).mean())\n    if not norms:\n        return torch.tensor([0.0], device=next(model.parameters()).device)\n    return torch.stack(norms)\n\n\n# ------------------------- GRAFF scheduler -------------------------------- #\n\nclass _GNNLayer(nn.Module):\n    def __init__(self, dim: int):\n        super().__init__()\n        self.msg = nn.Linear(dim * 2, dim)\n        self.upd = nn.GRUCell(dim, dim)\n\n    def forward(self, h):\n        N, D = h.shape\n        # fully-connected messages (excluding self) \u2013 expensive; approximate by mean\n        h_i = h.unsqueeze(1).repeat(1, N, 1)  # [N, N, D]\n        h_j = h.unsqueeze(0).repeat(N, 1, 1)  # [N, N, D]\n        msg = self.msg(torch.cat([h_i, h_j], -1)).mean(1)  # [N, D]\n        h_new = self.upd(msg, h)\n        return h_new\n\n\nclass GraffScheduler(nn.Module):\n    \"\"\"Budget-aware graph-recurrent LR planner.\"\"\"\n\n    def __init__(self, model, cfg):\n        super().__init__()\n        self.hidden_dim = 16\n        self.num_nodes = sum(\n            1 for n, _ in model.named_parameters() if (\"lora_A\" in n or \"lora_B\" in n)\n        )\n        self.h = nn.Parameter(torch.zeros(self.num_nodes, self.hidden_dim))\n        self.encoder_in = nn.Linear(3, self.hidden_dim)  # [curv, ent, budget]\n        self.gnn = _GNNLayer(self.hidden_dim)\n        self.decoder = nn.Linear(self.hidden_dim, 1)\n        self.stability_guard = cfg.training.scheduler.stability_guard\n        self.register_buffer(\"curv_max\", torch.tensor(1.0))\n\n    def step(self, curv: torch.Tensor, ent: torch.Tensor, budget_left: float):\n        if curv.numel() \u003c self.num_nodes:\n            pad = curv.new_zeros(self.num_nodes - curv.numel())\n            curv = torch.cat([curv, pad])\n        if ent.numel() \u003c self.num_nodes:\n            ent = ent.mean().expand(self.num_nodes)\n\n        feat = torch.stack([curv, ent, curv.new_full((self.num_nodes,), budget_left)], -1)\n        x = self.encoder_in(feat)\n        self.h = self.gnn(self.h + x)  # in-place state update\n\n        lr_log = self.decoder(self.h.mean(0))  # scalar\n        eta = torch.exp(lr_log).clamp(max=10.0)\n\n        # Stability projection: eta * max_curv \u003c= guard\n        c_max = curv.max().item() if curv.numel() else 1.0\n        if eta * c_max \u003e self.stability_guard:\n            eta = self.stability_guard / max(c_max, 1e-6)\n        return eta.item()\n\n\n# ------------------------- REACTOR baseline ------------------------------- #\n\nclass ReactorScheduler(nn.Module):\n    \"\"\"Minimal policy network for REACTOR-style RL baseline.\"\"\"\n\n    def __init__(self, cfg):\n        super().__init__()\n        self.lr_log = nn.Parameter(torch.tensor(0.0))\n        self.entropy_bonus = cfg.training.scheduler.entropy_bonus\n        self.baseline = 0.0\n        self.decay = cfg.training.scheduler.baseline_decay\n\n    def step(self, loss_val: torch.Tensor):\n        reward = -loss_val.item()  # lower loss better\n        # REINFORCE update\n        advantage = reward - self.baseline\n        self.baseline = self.baseline * self.decay + reward * (1 - self.decay)\n        self.lr_log.grad = torch.tensor(-advantage)  # maximise reward\n        lr = torch.exp(self.lr_log).item()\n        return lr\n", "preprocess_py": "from typing import Tuple, List, Dict\nfrom functools import partial\n\nimport torch\nfrom torch.utils.data import DataLoader\nfrom datasets import load_dataset\nfrom omegaconf import DictConfig\nfrom transformers import AutoTokenizer\n\n\n# --------------------------- Dataset utilities ---------------------------- #\n\ndef _format_example(ex, tokenizer: AutoTokenizer, max_tokens: int):\n    question = ex[\"question\"].strip()\n    # The answers in GSM8K have the format \"...#### 42\" \u2013 take part after last ####\n    answer = ex[\"answer\"].split(\"####\")[-1].strip()\n    prompt = f\"Question: {question}\\nAnswer: \"\n    full_str = f\"{prompt}{answer}\"\n    tokenised = tokenizer(\n        full_str,\n        truncation=True,\n        max_length=max_tokens,\n    )\n    tokenised[\"labels\"] = tokenised[\"input_ids\"].copy()\n    tokenised[\"prompt_ids\"] = tokenizer(prompt, truncation=True, max_length=max_tokens)[\n        \"input_ids\"\n    ]\n    return tokenised\n\n\ndef build_dataloaders(tokenizer: AutoTokenizer, cfg: DictConfig):\n    cache_dir = \".cache/\"\n    train_ds = load_dataset(\n        cfg.dataset.name,\n        split=cfg.dataset.train_split,\n        streaming=cfg.dataset.streaming,\n        cache_dir=cache_dir,\n    )\n    eval_ds = load_dataset(\n        cfg.dataset.name,\n        split=cfg.dataset.eval_split,\n        streaming=False,  # Evaluation small \u2013 load normally\n        cache_dir=cache_dir,\n    )\n\n    # Map to tokenised form\n    train_ds = train_ds.map(\n        partial(_format_example, tokenizer=tokenizer, max_tokens=cfg.dataset.max_tokens),\n        remove_columns=train_ds.column_names,\n    )\n    eval_ds = eval_ds.map(\n        partial(_format_example, tokenizer=tokenizer, max_tokens=cfg.dataset.max_tokens),\n        remove_columns=eval_ds.column_names,\n    )\n\n    def collate(batch: List[Dict]):\n        keys = batch[0].keys()\n        collated = {}\n        for k in keys:\n            if k == \"answers\":\n                collated[k] = [b[k] for b in batch]\n                continue\n            seqs = [b[k] for b in batch]\n            collated[k] = torch.tensor(\n                [torch.LongTensor(s) for s in seqs], dtype=torch.long\n            ).pad_sequence(batch_first=True, padding_value=tokenizer.pad_token_id)\n        return collated\n\n    train_loader = DataLoader(\n        train_ds,\n        batch_size=cfg.training.micro_batch_size,\n        shuffle=not cfg.dataset.streaming,\n        collate_fn=collate,\n    )\n    eval_loader = DataLoader(\n        eval_ds,\n        batch_size=cfg.training.micro_batch_size,\n        shuffle=False,\n        collate_fn=collate,\n    )\n    return train_loader, eval_loader\n\n\n# -------------------------- Metric: Dev EM (%) --------------------------- #\n\n\nclass EMAccuracy:\n    \"\"\"Exact match (string equality) tracker.\"\"\"\n\n    def __init__(self):\n        self.reset()\n\n    def reset(self):\n        self.correct = 0\n        self.total = 0\n        self.last_value = 0.0\n\n    def update(self, preds: List[str], answers: List[str]):\n        for p, a in zip(preds, answers):\n            p = p.strip()\n            a = a.strip()\n            self.correct += int(p == a)\n            self.total += 1\n        if self.total \u003e 0:\n            self.last_value = 100.0 * self.correct / self.total\n\n    def compute(self):\n        if self.total == 0:\n            return 0.0\n        return 100.0 * self.correct / self.total\n", "pyproject_toml": "[project]\nname = \"graff-experiments\"\nversion = \"0.1.0\"\ndescription = \"GRAFF learning-rate planner experiments\"\nrequires-python = \"\u003e=3.9\"\n\n[project.dependencies]\nhydra-core = \"^1.3.2\"\nomegaconf = \"^2.3.0\"\ntorch = \"^2.2.0\"\ntransformers = \"^4.38.0\"\npeft = \"^0.9.0\"\ndatasets = \"^2.17.0\"\nwandb = \"^0.16.4\"\noptuna = \"^3.5.0\"\nmatplotlib = \"^3.8.2\"\nseaborn = \"^0.13.2\"\npandas = \"^2.2.1\"\nnumpy = \"^1.26.4\"\nscikit-learn = \"^1.4.1\"\n", "train_py": "import os\nimport sys\nimport time\nimport json\nimport math\nimport subprocess\nfrom pathlib import Path\n\nimport torch\nimport torch.nn.functional as F\nfrom torch.utils.data import DataLoader\nfrom omegaconf import DictConfig, OmegaConf\n\nimport hydra\nfrom hydra.utils import get_original_cwd\n\nimport wandb\nimport optuna\n\nfrom .model import build_model, GraffScheduler, ReactorScheduler, compute_curvature, compute_token_entropy\nfrom .preprocess import build_dataloaders, EMAccuracy\n\n# ------------------------------ Utility helpers ----------------------------- #\n\ndef _configure_mode(cfg: DictConfig) -\u003e DictConfig:\n    \"\"\"Apply trial/full overrides *in-place*.\"\"\"\n    if cfg.mode == \"trial\":\n        cfg.wandb.mode = \"disabled\"\n        cfg.optuna.n_trials = 0\n        # Force minimal training\n        cfg.training.total_steps = 2\n        cfg.training.evaluation.interval_steps = 1\n    elif cfg.mode == \"full\":\n        cfg.wandb.mode = \"online\"\n    else:\n        raise ValueError(f\"Unknown mode {cfg.mode}\")\n    return cfg\n\n\ndef _init_wandb(cfg: DictConfig):\n    if cfg.wandb.mode == \"disabled\":\n        os.environ[\"WANDB_MODE\"] = \"disabled\"\n        return None\n\n    run = wandb.init(\n        entity=cfg.wandb.entity,\n        project=cfg.wandb.project,\n        id=cfg.run_id,\n        config=OmegaConf.to_container(cfg, resolve=True),\n        resume=\"allow\",\n        mode=cfg.wandb.mode,\n    )\n    print(\"[wandb] Run URL:\", run.get_url())\n    return run\n\n\n# --------------------------- Single-run trainer ----------------------------- #\n\n\ndef _single_run(cfg: DictConfig):\n    \"\"\"Train once with fixed hyper-parameters (no Optuna).\"\"\"\n    device = torch.device(\"cuda\" if torch.cuda.is_available() else \"cpu\")\n\n    # ---------------------------------------------------------------------\n    # 1.  Build model, tokenizer, LoRA.\n    # ---------------------------------------------------------------------\n    model, tokenizer = build_model(cfg.model)\n    model.to(device)\n\n    # ---------------------------------------------------------------------\n    # 2.  Data pipeline\n    # ---------------------------------------------------------------------\n    train_loader, eval_loader = build_dataloaders(tokenizer, cfg)\n\n    # ---------------------------------------------------------------------\n    # 3.  Optimisers \u0026 LR planner\n    # ---------------------------------------------------------------------\n    opt = torch.optim.AdamW(\n        params=[p for p in model.parameters() if p.requires_grad],\n        lr=cfg.training.optimizer.lr_init,\n        betas=tuple(cfg.training.optimizer.betas),\n        weight_decay=cfg.training.optimizer.weight_decay,\n    )\n\n    graff = None\n    reactor = None\n    if cfg.training.scheduler.type == \"graff\":\n        graff = GraffScheduler(model, cfg)\n        outer_opt = torch.optim.Adam(\n            graff.parameters(), lr=cfg.training.scheduler.outer_lr\n        )\n    elif cfg.training.scheduler.type == \"reactor\":\n        reactor = ReactorScheduler(cfg)\n        outer_opt = torch.optim.Adam(reactor.parameters(), lr=cfg.training.scheduler.controller_lr)\n    else:\n        outer_opt = None\n\n    scaler = torch.cuda.amp.GradScaler(enabled=\"bf16\" in str(cfg.training.mixed_precision).lower())\n\n    # ---------------------------------------------------------------------\n    # 4.  Metric trackers\n    # ---------------------------------------------------------------------\n    em_meter = EMAccuracy()\n\n    start_time = time.time()\n    budget_sec = cfg.training.budget_minutes * 60.0\n\n    step = 0\n    global_token_count = 0\n    wandb_run = _init_wandb(cfg)\n\n    model.train()\n    while step \u003c cfg.training.total_steps and (time.time() - start_time) \u003c budget_sec:\n        for batch in train_loader:\n            # Budget check each outer iter\n            if step \u003e= cfg.training.total_steps:\n                break\n            if (time.time() - start_time) \u003e= budget_sec:\n                break\n\n            input_ids = batch[\"input_ids\"].to(device)\n            attention_mask = batch[\"attention_mask\"].to(device)\n            labels = batch[\"labels\"].to(device)\n\n            with torch.autocast(device_type=\"cuda\", dtype=torch.bfloat16, enabled=\"bf16\" in str(cfg.training.mixed_precision).lower()):\n                outputs = model(\n                    input_ids=input_ids,\n                    attention_mask=attention_mask,\n                    labels=labels,\n                )\n                loss = outputs.loss\n\n            scaler.scale(loss).backward()\n\n            # ---------------- Scheduler stats \u0026 LR scaling ----------------\n            curvatures = compute_curvature(model)\n            entropies = compute_token_entropy(outputs.logits.detach())\n            remaining_budget = max(budget_sec - (time.time() - start_time), 0.0) / budget_sec\n\n            if graff is not None:\n                # step returns new LR factor\n                lr_factor = graff.step(curvatures, entropies, remaining_budget)\n                for g in opt.param_groups:\n                    g[\"lr\"] = cfg.training.optimizer.lr_init * lr_factor\n            elif reactor is not None:\n                lr_factor = reactor.step(loss.detach())\n                for g in opt.param_groups:\n                    g[\"lr\"] = cfg.training.optimizer.lr_init * lr_factor\n\n            scaler.unscale_(opt)\n            torch.nn.utils.clip_grad_norm_(model.parameters(), cfg.training.clip_grad_norm)\n\n            scaler.step(opt)\n            scaler.update()\n            opt.zero_grad(set_to_none=True)\n\n            if outer_opt is not None:\n                outer_opt.step()\n                outer_opt.zero_grad(set_to_none=True)\n\n            # ----------------------- Metric logging ----------------------\n            if wandb_run is not None:\n                wandb_run.log({\"train_loss\": loss.item(), \"lr\": opt.param_groups[0][\"lr\"], \"step\": step})\n            step += 1\n\n            # ----------------------- Periodic eval -----------------------\n            if step % cfg.training.evaluation.interval_steps == 0 or step == cfg.training.total_steps:\n                model.eval()\n                em_meter.reset()\n                with torch.no_grad():\n                    for e_batch in eval_loader:\n                        preds = model.generate(\n                            input_ids=e_batch[\"prompt_ids\"].to(device),\n                            attention_mask=e_batch[\"prompt_mask\"].to(device),\n                            max_new_tokens=128,\n                        )\n                        pred_str = tokenizer.batch_decode(preds[:, e_batch[\"prompt_ids\"].size(1):], skip_special_tokens=True)\n                        em_meter.update(pred_str, e_batch[\"answers\"])\n                        if cfg.mode == \"trial\":\n                            break  # keep it light-weight\n                em = em_meter.compute()\n\n                if wandb_run is not None:\n                    wandb_run.log({\"dev_exact_match\": em, \"step\": step})\n                model.train()\n\n    # ---------------------- End-of-run bookkeeping -------------------------\n    if wandb_run is not None:\n        wandb_run.summary[\"final_train_loss\"] = loss.item()\n        wandb_run.summary[\"final_dev_em\"] = em_meter.last_value\n        wandb_run.finish()\n\n\n# ------------------------ Optuna entry-point ----------------------------- #\n\n\ndef _optuna_objective(trial: optuna.Trial, cfg: DictConfig):\n    # Sample hyper-parameters defined in cfg.optuna.search_space\n    for hp_name, hp_cfg in cfg.optuna.search_space.items():\n        if hp_cfg.type == \"loguniform\":\n            sampled = trial.suggest_float(hp_name, hp_cfg.low, hp_cfg.high, log=True)\n        elif hp_cfg.type == \"uniform\":\n            sampled = trial.suggest_float(hp_name, hp_cfg.low, hp_cfg.high)\n        elif hp_cfg.type == \"categorical\":\n            sampled = trial.suggest_categorical(hp_name, hp_cfg.choices)\n        else:\n            raise ValueError(f\"Unsupported search space type {hp_cfg.type}\")\n        OmegaConf.update(cfg, hp_name.replace(\"_\", \".\"), sampled, merge=False)\n\n    # Train once with new hyper-params\n    _single_run(cfg)\n\n    # Fetch metric from wandb summary for this trial run\n    api = wandb.Api()\n    run = api.run(f\"{cfg.wandb.entity}/{cfg.wandb.project}/{cfg.run_id}\")\n    val_metric = run.summary.get(\"final_dev_em\", 0.0)\n    return val_metric\n\n\n# ------------------------------ Hydra entry ------------------------------ #\n\n@hydra.main(config_path=\"../config\", config_name=\"config\")\ndef train_app(cfg: DictConfig):\n    # Merge run-specific YAML\n    cwd = Path(get_original_cwd())\n    run_cfg_path = cwd / \"config\" / \"runs\" / f\"{cfg.run}.yaml\"\n    if not run_cfg_path.exists():\n        raise FileNotFoundError(f\"Run config {run_cfg_path} not found\")\n    run_cfg = OmegaConf.load(run_cfg_path)\n    cfg = OmegaConf.merge(cfg, run_cfg)\n\n    _configure_mode(cfg)\n    cfg.run_id = cfg.run_id if \"run_id\" in cfg else cfg.run  # ensure field exists\n\n    # Optuna or single run\n    if cfg.optuna.n_trials \u003e 0:\n        study = optuna.create_study(direction=cfg.optuna.direction)\n        study.optimize(lambda t: _optuna_objective(t, cfg), n_trials=cfg.optuna.n_trials)\n        print(\"[Optuna] Best value:\", study.best_value, \"params:\", study.best_params)\n    else:\n        _single_run(cfg)\n\n\nif __name__ == \"__main__\":\n    train_app()\n"}
+
+
+
+Analyze the experiment code thoroughly. Ensure it is complete, executable, and ready for publication-quality research experiments.
+Output:
+{
+    "is_code_ready": false,
+    "code_issue": "Code will not execute successfully and violates several core criteria:\n\n1. preprocess.py – collate() implementation is incorrect:\n   • Uses `torch.tensor(...).pad_sequence`, but `pad_sequence` is a function in `torch.nn.utils.rnn`, not a tensor method ⇒ AttributeError.\n   • Generates keys `prompt_ids`, but **never creates `prompt_mask`**; train.py later accesses `e_batch[\"prompt_mask\"]`, causing KeyError.\n\n2. train.py – wrong configuration paths:\n   • `_configure_mode` and training loop reference `cfg.training.evaluation.interval_steps`, yet the run-configs place `evaluation` at the **top level**. AttributeError when accessing `evaluation`.\n\n3. preprocess.py – _format_example() returns only tokenised ids; gold answer string is lost, so EMAccuracy cannot compare predictions to references (`answers` key absent in batch).\n\n4. _configure_mode overrides use an undefined field (`cfg.training.evaluation`) and sets `total_steps = 2`, then training loop still breaks if `evaluation.interval_steps` missing.\n\n5. build_dataloaders(): for streaming dataset, HuggingFace returns an IterableDataset, but the code uses `.map()` with `remove_columns`, which is unsupported on streaming datasets.\n\n6. train.py logging: `wandb_run.log({... , \"step\": step})` passes `step` both as metric and as WandB explicit step keyword; correct usage is `wandb_run.log({...}, step=step)`.\n\n7. Collate/padding logic produces ragged tensors; should use `nn.utils.rnn.pad_sequence` properly and create attention masks.\n\nBecause of these functional errors, the code is neither complete nor immediately executable. It needs bug-fixes in the data pipeline, configuration handling, and WandB logging to meet the stated production requirements."
+}
