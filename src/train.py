@@ -268,6 +268,8 @@ def main(cfg: DictConfig) -> None:  # noqa: D401
 
         def _objective(trial: optuna.Trial):
             # Suggest hyper-params according to search space declared in cfg
+            # Temporarily disable struct mode to allow updates
+            OmegaConf.set_struct(cfg, False)
             for hp_name, hp_spec in cfg.optuna.search_space.items():
                 if hp_spec.type == "loguniform":
                     val = trial.suggest_float(hp_name, hp_spec.low, hp_spec.high, log=True)
@@ -276,6 +278,7 @@ def main(cfg: DictConfig) -> None:  # noqa: D401
                 else:
                     raise ValueError("Unsupported hp type: " + str(hp_spec.type))
                 OmegaConf.update(cfg, hp_name.replace("_", "."), val, merge=False)
+            OmegaConf.set_struct(cfg, True)
             # Run *extremely* short train for speed (10 steps)
             cfg.training.total_steps = 10
             cfg.wandb.mode = "disabled"
@@ -286,8 +289,10 @@ def main(cfg: DictConfig) -> None:  # noqa: D401
         study.optimize(_objective, n_trials=cfg.optuna.n_trials)
         print("[optuna] best params:", study.best_params)
         # Update cfg with best params
+        OmegaConf.set_struct(cfg, False)
         for k, v in study.best_params.items():
             OmegaConf.update(cfg, k.replace("_", "."), v, merge=False)
+        OmegaConf.set_struct(cfg, True)
 
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~ final training ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     _train_single_run(cfg)
