@@ -18,10 +18,10 @@ optuna:
   n_trials: 0
   direction: maximize
   search_space:
-    adapter_lr_init: null
-    graff_outer_lr: null
-    controller_lr: null
-    lora_r: null
+    training_optimizer_lr_init: null
+    training_scheduler_outer_lr: null
+    training_scheduler_controller_lr: null
+    model_lora_r: null
 
 # Dummy defaults – will be overwritten by run-specific YAML.
 model:

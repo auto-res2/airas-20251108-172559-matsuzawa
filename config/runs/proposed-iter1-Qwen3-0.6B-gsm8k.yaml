@@ -48,14 +48,14 @@ optuna:
   n_trials: 50
   direction: maximize
   search_space:
-    adapter_lr_init:
+    training_optimizer_lr_init:
       type: loguniform
       low: 1.0e-4
       high: 5.0e-4
-    graff_outer_lr:
+    training_scheduler_outer_lr:
       type: loguniform
       low: 5.0e-4
       high: 2.0e-3
-    lora_r:
+    model_lora_r:
       type: categorical
       choices: [32, 64, 96]
