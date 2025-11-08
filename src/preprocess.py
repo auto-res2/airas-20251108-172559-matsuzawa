@@ -49,12 +49,14 @@ def build_dataloaders(cfg: DictConfig):
     # ----------------------------- dataset ----------------------------------
     ds_train = load_dataset(
         cfg.dataset.name,
+        "main",  # GSM8K requires config name ('main' or 'socratic')
         split=cfg.dataset.train_split,
         streaming=cfg.dataset.streaming,
         cache_dir=_CACHE_DIR,
     )
     ds_eval = load_dataset(
         cfg.dataset.name,
+        "main",  # GSM8K requires config name ('main' or 'socratic')
         split=cfg.dataset.eval_split,
         streaming=False,  # eval set is usually small – keep in memory for speed
         cache_dir=_CACHE_DIR,
