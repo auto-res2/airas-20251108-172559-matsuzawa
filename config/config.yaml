@@ -1,0 +1,29 @@
+# -----------------------------------------------------------------------------
+#                     Global (repository-level) Hydra config
+# -----------------------------------------------------------------------------
+
+# The *run* will be merged in at runtime by src.main/src.train.
+run: null          # to be overridden: run=<run_id>
+mode: full         # trial | full
+results_dir: ./results
+
+wandb:
+  entity: gengaru617-personal
+  project: 2025-1108-1
+  mode: online            # may be overwritten to "disabled" in trial mode
+
+optuna:
+  n_trials: 0
+  direction: maximize
+  search_space: {}
+
+# Dummy defaults – will be overwritten by run-specific YAML.
+model: {}
+dataset: {}
+training: {}
+evaluation:
+  interval_steps: 100
+
+hydra:
+  run:
+    dir: .                # keep cwd unchanged so that relative paths are stable
